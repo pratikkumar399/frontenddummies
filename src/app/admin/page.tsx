@@ -52,7 +52,7 @@ export default function AdminPage() {
     };
 
     addTemplate(newTemplate);
-    navigate('/');
+    router.push('/');
   };
 
   return (
