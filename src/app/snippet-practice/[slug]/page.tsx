@@ -7,12 +7,13 @@ import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import { ChevronLeft, Play, CheckCircle2, XCircle, Info } from 'lucide-react';
 import { Button } from '@/ui/Button';
+import { Snippet, Template } from '@/types/types';
 
 export default function SnippetPracticePage() {
   const { slug } = useParams<{ slug: string }>();
   const { templates } = useApp();
   const router = useRouter();
-  const template = templates.find(t => t.slug === slug) as any;
+  const template = templates.find(t => t.slug === slug) as Template;
 
   // State
   const [answers, setAnswers] = useState<Record<string, number>>({});
@@ -80,7 +81,7 @@ export default function SnippetPracticePage() {
       {/* Content */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
         
-        {template.snippets?.map((snippet, index) => {
+        {template.snippets?.map((snippet : Snippet, index : number) => {
             const userAns = answers[snippet.id];
             const isAnswered = userAns !== undefined;
             const isCorrect = userAns === snippet.correctAnswer;
