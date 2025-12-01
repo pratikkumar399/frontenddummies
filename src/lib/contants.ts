@@ -1,169 +1,9 @@
 import { Template, Category } from '@/types/types';
-
-const NEWS_FEED_SYSTEM_DESIGN_MD = `
-# Design a News Feed System
-
-Designing a news feed (like Facebook News Feed, Instagram Feed, or Twitter Timeline) is a classic system design challenge. It tests your ability to handle scale, data modeling, and latency.
-
-## 1. Requirements
-
-### Functional Requirements
-*   **Post Creation**: Users can create posts (text, images, video).
-*   **Feed Generation**: Users can view a feed of posts from friends/pages they follow.
-*   **Interaction**: Users can like and comment on posts.
-*   **Ordering**: The feed can be chronological or ranked by relevance.
-
-### Non-Functional Requirements
-*   **Latency**: Generating a feed must be fast (under 200ms).
-*   **Availability**: The system needs high availability; users should always see *some* feed, even if slightly stale.
-*   **Consistency**: Eventual consistency is acceptable. A post doesn't need to appear in every follower's feed instantly.
-
-## 2. Capacity Estimation (Back-of-the-envelope)
-
-Assume:
-*   **DAU**: 300 Million
-*   **Read/Write Ratio**: 100:1 (Heavy read system)
-*   **Avg Post Size**: 1KB (metadata) + media storage separately.
-
-**Traffic:**
-*   Writes: 300M * 5 posts/day = 1.5 Billion posts/day. ~17k QPS.
-*   Reads: 300M * 10 views/day = 3 Billion views/day. ~35k QPS.
-
-**Storage:**
-*   1.5B posts * 1KB = 1.5 TB/day.
-*   5 Years = ~2.7 PB.
-
-## 3. High Level API Design
-
-We need two main endpoints:
-
-\`\`\`http
-POST /v1/posts
-Authorization: Bearer <token>
-Body: { content: "Hello World", media_ids: [...] }
-\`\`\`
-
-\`\`\`http
-GET /v1/feed
-Authorization: Bearer <token>
-Query: { cursor: "next_page_token", limit: 20 }
-\`\`\`
-
-## 4. Database Schema
-
-We need a relational database for metadata (MySQL/PostgreSQL) and a NoSQL store (Cassandra/DynamoDB) for the feed or activity items if scaling is extreme.
-
-**Users Table**:
-*   \`user_id\` (PK)
-*   \`username\`
-*   \`avatar_url\`
-
-**Posts Table**:
-*   \`post_id\` (PK)
-*   \`user_id\` (FK)
-*   \`content\`
-*   \`created_at\`
-*   \`media_urls\`
-
-**Follows Table**:
-*   \`follower_id\` (FK)
-*   \`followee_id\` (FK)
-*   (Composite PK on both)
-
-## 5. System Architecture
-
-### Feed Generation Strategies
-
-There are two main approaches to generating the feed:
-
-#### A. Pull Model (Fan-out on Load)
-When a user loads their homepage, the system:
-1.  Fetches IDs of all users they follow.
-2.  Fetches the latest posts for each of those users.
-3.  Merges and sorts them in memory.
-
-*   **Pros**: Simple storage. Real-time updates.
-*   **Cons**: Very slow for users following thousands of people. High compute load during reads.
-
-#### B. Push Model (Fan-out on Write)
-When a user creates a post:
-1.  The system finds all their followers.
-2.  It inserts the post ID into a pre-computed "Feed Cache" for each follower.
-3.  When a follower reads their feed, we simply read from their cache.
-
-*   **Pros**: extremely fast reads (O(1)).
-*   **Cons**: "Justin Bieber" problem. If a celebrity has 100M followers, writing one post triggers 100M updates.
-
-#### C. Hybrid Approach (Recommended)
-*   **Normal Users**: Use Push model. Pre-compute feeds.
-*   **Celebrities**: Use Pull model. Do not push their posts to all 100M queues. Instead, fetch their posts at read-time and merge them.
-
-## 6. Detailed Design Components
-
-### Feed Service
-This service handles the \`GET /feed\` request.
-1.  Check Redis Cache for the pre-computed feed.
-2.  If empty, fallback to DB and rebuild cache.
-3.  Hydrate post IDs with content (user info, images) concurrently.
-
-### Fan-out Service
-An async worker queue (Kafka/RabbitMQ) that processes new posts.
-1.  User A posts.
-2.  Service gets followers of A.
-3.  Service appends \`post_id\` to the Redis list of each follower.
-
-## 7. Scalability Improvements
-
-*   **Sharding**: Shard the Feed Cache (Redis) by \`user_id\`.
-*   **CDN**: Serve all static media (images/videos) from CDN.
-*   **Caching**: Cache popular posts and user profiles in Memcached/Redis to reduce DB hits.
-
-## 8. Summary
-The Hybrid approach balances read latency and write amplification. By using a pre-computed feed for most users and merging celebrity content at read time, we ensure the system is responsive and scalable.
-`;
-
-const INFINITE_SCROLL_MD = `
-# Infinite Scroll Component
-
-Implementing an infinite scroll component is a standard frontend task that tests your knowledge of the DOM, performance optimization, and asynchronous data fetching.
-
-## Requirements
-*   **Lazy Loading**: Fetch data only when the user nears the bottom of the list.
-*   **Performance**: Do not attach scroll event listeners directly to the window without throttling. Ideally, use \`IntersectionObserver\`.
-*   **UX**: Show a loading spinner while fetching. Handle "end of list" state.
-
-## Implementation Strategy
-
-### 1. The Intersection Observer API
-Instead of listening to the \`scroll\` event (which fires continuously), use \`IntersectionObserver\`. This API asynchronously observes changes in the intersection of a target element with an ancestor element or the viewport.
-
-### 2. Basic Structure
-\`\`\`jsx
-function InfiniteList() {
-  const [items, setItems] = useState([]);
-  const [page, setPage] = useState(1);
-  const loaderRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        setPage(p => p + 1);
-      }
-    });
-    
-    if (loaderRef.current) observer.observe(loaderRef.current);
-    
-    return () => observer.disconnect();
-  }, []);
-  
-  // ... fetching logic for 'page'
-}
-\`\`\`
-
-## Edge Cases
-*   **Race Conditions**: Ensure that if a request is already in flight, you don't trigger another one.
-*   **Virtualization**: If the list gets very long (1000+ items), the DOM size will slow down the browser. You might need "Windowing" (rendering only visible items).
-`;
+import { NEWS_FEED_SYSTEM_DESIGN_MD } from '@/data/markdown/news-feed-system-design';
+import { INFINITE_SCROLL_MD } from '@/data/markdown/infinite-scroll';
+import { JS_OUTPUT_CHALLENGES_SNIPPETS } from '@/data/snippets/js-output-challenges';
+import { DEBOUNCE_THROTTLE_STARTER_CODE } from '@/data/starter-code/debounce-throttle';
+import { TREE_TRAVERSAL_STARTER_CODE } from '@/data/starter-code/tree-traversal';
 
 export const INITIAL_TEMPLATES: Template[] = [
   {
@@ -195,82 +35,7 @@ export const INITIAL_TEMPLATES: Template[] = [
     techStack: ['JavaScript', 'ES6'],
     author: 'JSNinja',
     createdAt: '2023-12-10',
-    snippets: [
-      {
-        id: 's1',
-        title: 'Variable Hoisting',
-        code: `console.log(a);
-var a = 10;
-function test() {
-  console.log(a);
-  var a = 20;
-}
-test();`,
-        options: [
-          'undefined, undefined',
-          'ReferenceError, 10',
-          'undefined, 20',
-          '10, 20'
-        ],
-        correctAnswer: 0,
-        explanation: 'In the first log, `a` is hoisted but not initialized, so it is `undefined`. In `test()`, the local `var a` is hoisted to the top of the function scope, shadowing the global `a`. So the second log is also `undefined` before assignment.'
-      },
-      {
-        id: 's2',
-        title: 'Event Loop & SetTimeout',
-        code: `console.log(1);
-setTimeout(() => console.log(2), 0);
-Promise.resolve().then(() => console.log(3));
-console.log(4);`,
-        options: [
-          '1, 2, 3, 4',
-          '1, 4, 2, 3',
-          '1, 4, 3, 2',
-          '1, 3, 4, 2'
-        ],
-        correctAnswer: 2,
-        explanation: 'Synchronous code runs first (1, 4). Then Microtasks (Promises) run (3). Finally, Macrotasks (setTimeout) run (2).'
-      },
-      {
-        id: 's3',
-        title: 'Object Reference',
-        code: `const a = {};
-const b = { key: 'b' };
-const c = { key: 'c' };
-
-a[b] = 123;
-a[c] = 456;
-
-console.log(a[b]);`,
-        options: [
-          '123',
-          '456',
-          'undefined',
-          'Object'
-        ],
-        correctAnswer: 1,
-        explanation: 'Object keys are converted to strings. `b` becomes `"[object Object]"` and `c` becomes `"[object Object]"`. So `a["[object Object]"]` is first set to 123, then overwritten by 456.'
-      },
-      {
-        id: 's4',
-        title: 'Closure & Let vs Var',
-        code: `for (var i = 0; i < 3; i++) {
-  setTimeout(() => console.log(i), 1);
-}
-
-for (let j = 0; j < 3; j++) {
-  setTimeout(() => console.log(j), 1);
-}`,
-        options: [
-          '0 1 2 and 0 1 2',
-          '3 3 3 and 0 1 2',
-          '3 3 3 and 3 3 3',
-          '0 1 2 and 3 3 3'
-        ],
-        correctAnswer: 1,
-        explanation: '`var` has function scope, so the closure captures the same reference to `i`, which is 3 by the time the timeout runs. `let` has block scope, so each iteration creates a new binding for `j`.'
-      }
-    ]
+    snippets: JS_OUTPUT_CHALLENGES_SNIPPETS
   },
   {
     id: '2',
@@ -286,32 +51,7 @@ for (let j = 0; j < 3; j++) {
     techStack: ['JavaScript', 'Closures', 'Async'],
     author: 'JSHero',
     createdAt: '2023-11-02',
-    starterCode: `/**
- * @param {Function} func
- * @param {number} wait
- * @return {Function}
- */
-function debounce(func, wait) {
-  // Your code here
-}
-
-/**
- * @param {Function} func
- * @param {number} wait
- * @return {Function}
- */
-function throttle(func, wait) {
-  // Your code here
-}
-
-// Test your code here
-const log = () => console.log('Fired!');
-const debouncedLog = debounce(log, 1000);
-
-debouncedLog();
-debouncedLog();
-debouncedLog(); // Should only fire once after 1s
-`
+    starterCode: DEBOUNCE_THROTTLE_STARTER_CODE
   },
   {
     id: '3',
@@ -402,35 +142,6 @@ debouncedLog(); // Should only fire once after 1s
     techStack: ['JavaScript', 'DOM Manipulation', 'Algorithms'],
     author: 'AlgoExpert',
     createdAt: '2023-09-01',
-    starterCode: `class Node {
-  constructor(value) {
-    this.value = value;
-    this.left = null;
-    this.right = null;
-  }
-}
-
-// Initial Tree
-const root = new Node(1);
-root.left = new Node(2);
-root.right = new Node(3);
-root.left.left = new Node(4);
-root.left.right = new Node(5);
-
-/**
- * Perform Depth First Search (Pre-order)
- * @param {Node} node
- */
-function dfs(node) {
-  if (!node) return;
-  
-  console.log(node.value);
-  
-  dfs(node.left);
-  dfs(node.right);
-}
-
-console.log("Starting DFS:");
-dfs(root);`
+    starterCode: TREE_TRAVERSAL_STARTER_CODE
   }
 ];
