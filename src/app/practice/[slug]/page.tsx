@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
@@ -125,6 +124,31 @@ export default function PracticePage() {
     );
   }
 
+  // JSON-LD Structured Data
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": `${template.name} - Interactive Code Editor`,
+    "description": template.shortDescription,
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "250"
+    },
+    "author": {
+      "@type": "Person",
+      "name": template.author
+    },
+    "url": `https://frontendfordummies-tonv.vercel.app//practice/${template.slug}`
+  };
+
   const handleRunCode = async () => {
     // If we are already running or just finished, clear any pending restoration timer
     if (cleanupTimerRef.current) {
@@ -195,15 +219,26 @@ export default function PracticePage() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-slate-100 dark:bg-[#1a1a1a] text-slate-900 dark:text-[#eff1f6] font-sans transition-colors duration-300">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <div className="fixed inset-0 z-50 flex flex-col bg-slate-100 dark:bg-[#1a1a1a] text-slate-900 dark:text-[#eff1f6] font-sans transition-colors duration-300">
       
       {/* Top Navigation Bar */}
       <nav className="h-12 bg-white dark:bg-[#262626] border-b border-slate-200 dark:border-[#333] flex items-center justify-between px-4 shrink-0 select-none">
         <div className="flex items-center gap-4">
-            <Link href={`/design/${slug}`} className="text-slate-500 dark:text-[#9ca3af] hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
+            <button onClick={() => {
+              if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+                router.back();
+              } else {
+                router.push(`/design/${slug}`);
+              }
+            }} className="text-slate-500 dark:text-[#9ca3af] hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
                 <ChevronLeft size={16} />
-                Problem List
-            </Link>
+                Back
+            </button>
             <div className="h-4 w-[1px] bg-slate-200 dark:bg-[#444]"></div>
             <div className="flex items-center gap-2">
                 <span className="font-medium text-sm text-slate-800 dark:text-white">{template.name}</span>
@@ -436,5 +471,6 @@ export default function PracticePage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

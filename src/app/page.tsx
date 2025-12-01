@@ -12,8 +12,51 @@ export default function Home() {
   // Show only a few featured templates on the landing page
   const featuredTemplates = templates.slice(0, 4);
 
+  // JSON-LD Structured Data
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Frontend For Dummies",
+    "description": "A comprehensive platform for mastering frontend coding skills, system design, and building real-world projects.",
+    "url": "https://frontendfordummies-tonv.vercel.app/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://frontendfordummies-tonv.vercel.app//explore?search={search_term_string}",
+      "query-input": "required name=search_term_string"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Frontend For Dummies",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://frontendfordummies-tonv.vercel.app//logo.png"
+      }
+    }
+  };
+
+  const organizationData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Frontend For Dummies",
+    "url": "https://frontendfordummies-tonv.vercel.app/",
+    "logo": "https://frontendfordummies-tonv.vercel.app//logo.png",
+    "sameAs": [
+      "https://github.com/pratikkumar399/frontendfordummies"
+    ],
+    "description": "A comprehensive platform for mastering frontend coding skills, system design, and building real-world projects."
+  };
+
   return (
-    <div className="min-h-screen bg-dark-bg selection:bg-primary-500/30 relative">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationData) }}
+      />
+      <div className="min-h-screen bg-dark-bg selection:bg-primary-500/30 relative">
       
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
          {/* Grid Pattern */}
@@ -134,5 +177,6 @@ export default function Home() {
         </div>
       </section>
     </div>
+    </>
   );
 };

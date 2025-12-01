@@ -29,8 +29,53 @@ export default function ExplorePage() {
     setIsSidebarOpen(false);
   };
 
+  // JSON-LD Structured Data
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Explore Frontend Challenges",
+    "description": "Browse our complete collection of frontend coding challenges, system design problems, and interactive practice exercises.",
+    "url": "https://frontendfordummies-tonv.vercel.app//explore",
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": templates.length,
+      "itemListElement": templates.slice(0, 10).map((template, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
+          "@type": "Course",
+          "name": template.name,
+          "description": template.shortDescription,
+          "url": `https://frontendfordummies-tonv.vercel.app//design/${template.slug}`
+        }
+      }))
+    },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://frontendfordummies-tonv.vercel.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Explore",
+          "item": "https://frontendfordummies-tonv.vercel.app//explore"
+        }
+      ]
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-dark-bg pt-16">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <div className="min-h-screen bg-dark-bg pt-16">
       <div className="flex flex-col md:flex-row min-h-[calc(100vh-64px)] relative">
         
         {/* Mobile Sidebar Overlay */}
@@ -140,7 +185,7 @@ export default function ExplorePage() {
                 <Zap size={48} className="mx-auto text-zinc-700 mb-4" />
                 <h3 className="text-lg font-medium text-white mb-2">No challenges found</h3>
                 <p className="text-zinc-500 mb-6 text-sm max-w-xs mx-auto">
-                  We couldn't find any challenges matching your search filters.
+                  We couldn&apos;t find any challenges matching your search filters.
                 </p>
                 <button 
                   onClick={() => {setSearchQuery(''); setSelectedCategory('All');}}
@@ -154,5 +199,6 @@ export default function ExplorePage() {
         </main>
       </div>
     </div>
+    </>
   );
 };

@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
 import { Button } from '@/ui/Button';
 import { Badge } from '@/ui/Badge';
@@ -31,9 +30,41 @@ export default function DetailPage() {
   const isIDESupported = (template.category === Category.JAVASCRIPT || template.category === Category.ALGORITHMS) && template.starterCode;
   const isSnippetSupported = template.category === Category.SNIPPET_PRACTICE && template.snippets && template.snippets.length > 0;
 
+  // JSON-LD Structured Data
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": template.name,
+    "description": template.shortDescription,
+    "provider": {
+      "@type": "Organization",
+      "name": "Frontend For Dummies",
+      "sameAs": "https://frontendfordummies-tonv.vercel.app/"
+    },
+    "educationalLevel": template.tags.find(t => ['Easy', 'Medium', 'Hard'].includes(t)) || 'Intermediate',
+    "teaches": template.techStack,
+    "keywords": template.tags.join(', '),
+    "datePublished": template.createdAt,
+    "author": {
+      "@type": "Person",
+      "name": template.author
+    },
+    "image": template.imageUrl,
+    "url": `https://frontendfordummies-tonv.vercel.app//design/${template.slug}`,
+    "hasCourseInstance": {
+      "@type": "CourseInstance",
+      "courseMode": "online",
+      "courseWorkload": "PT45M"
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-dark-bg pt-24 pb-12 relative overflow-hidden">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <div className="min-h-screen bg-dark-bg pt-24 pb-12 relative overflow-hidden">
         {/* Background blobs */}
        <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="glow-blob bg-primary-600/5 w-[800px] h-[800px] top-[0] right-[-200px] blur-[120px]"></div>
@@ -43,13 +74,19 @@ export default function DetailPage() {
         
         {/* Breadcrumb / Back */}
         <div className="mb-8">
-          <Link
-            href="/explore"
+          <button
+            onClick={() => {
+              if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+                router.back();
+              } else {
+                router.push('/explore');
+              }
+            }}
             className="inline-flex items-center text-sm text-zinc-400 hover:text-white transition-colors px-3 py-1.5 rounded-md bg-dark-card border border-dark-border hover:bg-dark-accent"
           >
             <ArrowLeft size={16} className="mr-2" />
-            Back to Challenges
-          </Link>
+            Back
+          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -222,5 +259,6 @@ export default function DetailPage() {
         </div>
       </div>
     </div>
+    </>
   );
 };

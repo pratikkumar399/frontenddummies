@@ -3,7 +3,6 @@
 
 import React, { useState } from 'react';
 import { useParams } from 'next/navigation';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';    
 import { useApp } from '@/context/AppContext';
 import { ChevronLeft, Play, CheckCircle2, XCircle, Info } from 'lucide-react';
@@ -19,7 +18,6 @@ export default function SnippetPracticePage() {
   // State
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [output, setOutput] = useState<Record<string, string>>({});
-  const [showExplanation, setShowExplanation] = useState<Record<string, boolean>>({});
 
   if (!template || !template.snippets) {
      return (
@@ -29,6 +27,25 @@ export default function SnippetPracticePage() {
         </div>
     );
   }
+
+  // JSON-LD Structured Data
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Quiz",
+    "name": template.name,
+    "description": template.shortDescription,
+    "educationalLevel": template.tags.find(t => ['Easy', 'Medium', 'Hard'].includes(t)) || 'Intermediate',
+    "teaches": template.techStack,
+    "author": {
+      "@type": "Person",
+      "name": template.author
+    },
+    "datePublished": template.createdAt,
+    "numberOfQuestions": template.snippets?.length || 0,
+    "url": `https://frontendfordummies-tonv.vercel.app//snippet-practice/${template.slug}`,
+    "inLanguage": "en-US",
+    "interactivityType": "active"
+  };
 
   const handleRunSnippet = (id: string, code: string) => {
     // Capture console output
@@ -40,7 +57,6 @@ export default function SnippetPracticePage() {
     console.error = (...args) => logs.push(`Error: ${args.map(a => String(a)).join(' ')}`);
 
     try {
-        // eslint-disable-next-line no-new-func
         new Function(code)();
     } catch (e: unknown) {
         logs.push(`Runtime Error: ${e instanceof Error ? e.message : 'Unknown error'}`);
@@ -63,14 +79,25 @@ export default function SnippetPracticePage() {
   };
 
   return (
-    <div className="min-h-screen bg-dark-bg pt-16">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <div className="min-h-screen bg-dark-bg pt-16">
       
       {/* Header */}
       <nav className="sticky w-[80%] mx-auto top-0 z-40  h-16 flex justify-center items-center px-4 sm:px-6 lg:px-8">
-        <Link href={`/design/${slug}`} className="flex items-center gap-2 text-slate-500 dark:text-[#9ca3af] hover:text-slate-900 dark:hover:text-white transition-colors">
+        <button onClick={() => {
+          if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+            router.back();
+          } else {
+            router.push(`/design/${slug}`);
+          }
+        }} className="flex items-center gap-2 text-slate-500 dark:text-[#9ca3af] hover:text-slate-900 dark:hover:text-white transition-colors">
             <ChevronLeft size={20} />
-            <span className="font-medium">Go back</span>
-        </Link>
+            <span className="font-medium">Back</span>
+        </button>
         <div className="h-6 w-[1px] bg-slate-200 dark:bg-[#444] mx-4"></div>
         <h1 className="text-lg font-bold truncate">{template.name}</h1>
       </nav>
@@ -187,5 +214,6 @@ export default function SnippetPracticePage() {
 
       </div>
     </div>
+    </>
   );
 };

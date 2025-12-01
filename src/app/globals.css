@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+
+
 :root {
    --background: #121212;
   --foreground: #e2e8f0;
@@ -194,9 +196,8 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border ;
   }
-
   body {
     @apply bg-background text-foreground;
   }
