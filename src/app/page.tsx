@@ -53,12 +53,12 @@ export default function Home() {
                 <ArrowRight size={20} className="ml-2" />
               </Button>
             </Link>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+            <Link href="https://github.com/pratikkumar399/frontendfordummies" target="_blank" rel="noopener noreferrer">
                <Button variant="secondary" size="lg" className="h-14 px-8 text-lg bg-zinc-900/50 backdrop-blur-sm border-zinc-800 hover:bg-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700 hover:scale-105 transition-all duration-300">
                 <Github size={20} className="mr-2" />
-                Star on GitHub
+                Star on GitHub <ArrowRight size={20} className="ml-2" />
                </Button>
-            </a>
+            </Link>
           </div>
 
           {/* Feature Cards Grid */}

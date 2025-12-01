@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import Editor from '@monaco-editor/react';
 import { 
@@ -25,7 +26,7 @@ interface LogEntry {
 
 export default function PracticePage() {
   const { slug } = useParams<{ slug: string }>();
-  const { templates } = useApp();
+  const { templates, isDarkMode } = useApp();
   const router = useRouter();
   const template = templates.find(t => t.slug === slug);
 
@@ -44,6 +45,10 @@ export default function PracticePage() {
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
+  
+  // Console Capture Refs
+  const originalConsoleRef = useRef({ log: console.log, error: console.error });
+  const cleanupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Initialize Code
   useEffect(() => {
@@ -51,6 +56,17 @@ export default function PracticePage() {
       setCode(template.starterCode);
     }
   }, [template]);
+
+  // Cleanup console override on unmount
+  useEffect(() => {
+    return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      console.log = originalConsoleRef.current.log;
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      console.error = originalConsoleRef.current.error;
+      if (cleanupTimerRef.current) clearTimeout(cleanupTimerRef.current);
+    };
+  }, []);
 
   // Drag Handlers
   const handleMouseDownH = (e: React.MouseEvent) => {
@@ -102,76 +118,102 @@ export default function PracticePage() {
 
   if (!template) {
     return (
-        <div className="min-h-screen bg-[#1a1a1a] flex flex-col items-center justify-center p-4 text-white">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#1a1a1a] flex flex-col items-center justify-center p-4 text-slate-900 dark:text-white transition-colors duration-300">
              <h2 className="text-xl mb-4">Template not found</h2>
-             <button onClick={() => router.push('/')} className="px-4 py-2 bg-primary-600 rounded">Go Home</button>
+             <button onClick={() => router.push('/')} className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700">Go Home</button>
         </div>
     );
   }
 
   const handleRunCode = async () => {
+    // If we are already running or just finished, clear any pending restoration timer
+    if (cleanupTimerRef.current) {
+        clearTimeout(cleanupTimerRef.current);
+        cleanupTimerRef.current = null;
+    }
+    
     setIsRunning(true);
     setLogs([]);
 
-    const capturedLogs: LogEntry[] = [];
-    const originalLog = console.log;
-    const originalError = console.error;
-
-    const addLog = (type: 'log' | 'error', args: any[]) => {
-      const content = args.map(arg => {
+    // Proxy function to capture logs
+    const proxyLog = (type: 'log' | 'error', args: any[]) => {
+       const content = args.map(arg => {
+        if (arg === undefined) return 'undefined';
+        if (arg === null) return 'null';
         if (typeof arg === 'object') {
-            return JSON.stringify(arg, null, 2);
+            try {
+                return JSON.stringify(arg, null, 2);
+            } catch (e) {
+                return String(arg); // Fallback for circular refs etc
+            }
         }
         return String(arg);
       }).join(' ');
-      
-      capturedLogs.push({
+
+      const newEntry: LogEntry = {
         type,
         content,
         timestamp: new Date().toLocaleTimeString()
-      });
+      };
+      
+      // Update state immediately so async logs appear as they happen
+      setLogs(prev => [...prev, newEntry]);
+      
+      // Pass through to actual console for debugging
+      originalConsoleRef.current[type](...args);
     };
 
-    console.log = (...args) => addLog('log', args);
-    console.error = (...args) => addLog('error', args);
+    // Override console
+    console.log = (...args) => proxyLog('log', args);
+    console.error = (...args) => proxyLog('error', args);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Small delay to allow React to render loading state
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      // Execute the code
       // eslint-disable-next-line no-new-func
-      const result = new Function(code);
-      result();
-      addLog('log', ['>>> Execution finished']);
+      const func = new Function(code);
+      func();
+      
     } catch (err: any) {
-      addLog('error', [err.toString()]);
+      setLogs(prev => [...prev, {
+        type: 'error',
+        content: err.toString(),
+        timestamp: new Date().toLocaleTimeString()
+      }]);
     } finally {
-      console.log = originalLog;
-      console.error = originalError;
-      setLogs(capturedLogs);
       setIsRunning(false);
       if (consoleHeight < 20) setConsoleHeight(35);
+      
+      // Wait 5 seconds before restoring console to catch async logs (setTimeout, Promises)
+      cleanupTimerRef.current = setTimeout(() => {
+          console.log = originalConsoleRef.current.log;
+          console.error = originalConsoleRef.current.error;
+      }, 5000);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#1a1a1a] text-[#eff1f6] font-sans">
+    <div className="fixed inset-0 z-50 flex flex-col bg-slate-100 dark:bg-[#1a1a1a] text-slate-900 dark:text-[#eff1f6] font-sans transition-colors duration-300">
       
       {/* Top Navigation Bar */}
-      <nav className="h-12 bg-[#262626] border-b border-[#333] flex items-center justify-between px-4 shrink-0 select-none">
+      <nav className="h-12 bg-white dark:bg-[#262626] border-b border-slate-200 dark:border-[#333] flex items-center justify-between px-4 shrink-0 select-none">
         <div className="flex items-center gap-4">
-              <Link href={`/design/${slug}`} className="text-[#9ca3af] hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
+            <Link href={`/design/${slug}`} className="text-slate-500 dark:text-[#9ca3af] hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
                 <ChevronLeft size={16} />
                 Problem List
             </Link>
-            <div className="h-4 w-[1px] bg-[#444]"></div>
+            <div className="h-4 w-[1px] bg-slate-200 dark:bg-[#444]"></div>
             <div className="flex items-center gap-2">
-                <span className="font-medium text-sm">{template.name}</span>
+                <span className="font-medium text-sm text-slate-800 dark:text-white">{template.name}</span>
             </div>
         </div>
         
         <div className="flex items-center gap-3">
              <button 
                 onClick={() => setCode(template.starterCode || '')}
-                className="p-1.5 text-[#9ca3af] hover:bg-[#3e3e3e] rounded-md transition-colors"
+                className="p-1.5 text-slate-500 dark:text-[#9ca3af] hover:bg-slate-100 dark:hover:bg-[#3e3e3e] rounded-md transition-colors"
                 title="Reset Code"
              >
                 <RotateCcw size={15} />
@@ -181,7 +223,7 @@ export default function PracticePage() {
                 onClick={handleRunCode} 
                 disabled={isRunning}
                 className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
-                    isRunning ? 'bg-[#3e3e3e] text-[#9ca3af] cursor-not-allowed' : 'bg-green-600/90 hover:bg-green-600 text-white shadow-lg shadow-green-900/20'
+                    isRunning ? 'bg-slate-200 dark:bg-[#3e3e3e] text-slate-500 dark:text-[#9ca3af] cursor-not-allowed' : 'bg-green-600/90 hover:bg-green-600 text-white shadow-lg shadow-green-900/20'
                 }`}
              >
                 {isRunning ? (
@@ -199,22 +241,22 @@ export default function PracticePage() {
       {/* Workspace Split Layout */}
       <div 
         ref={containerRef}
-        className="flex-1 flex min-h-0 p-2 overflow-hidden bg-[#1a1a1a]"
+        className="flex-1 flex min-h-0 p-2 overflow-hidden bg-slate-100 dark:bg-[#1a1a1a]"
       >
         
         {/* LEFT PANEL: Description */}
         <div 
-            className="flex flex-col bg-[#262626] rounded-lg overflow-hidden border border-[#333] min-w-[200px]"
+            className="flex flex-col bg-white dark:bg-[#262626] rounded-lg overflow-hidden border border-slate-200 dark:border-[#333] min-w-[200px]"
             style={{ width: `${leftWidth}%` }}
         >
             {/* Tabs */}
-            <div className="h-10 bg-[#333]/30 border-b border-[#3e3e3e] flex items-center gap-1 px-2 shrink-0">
+            <div className="h-10 bg-slate-50 dark:bg-[#333]/30 border-b border-slate-200 dark:border-[#3e3e3e] flex items-center gap-1 px-2 shrink-0">
                 <button 
                     onClick={() => setActiveTab('description')}
                     className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-t-md transition-colors ${
                         activeTab === 'description' 
-                        ? 'bg-[#262626] text-white border-t border-x border-[#3e3e3e] relative -bottom-[1px]' 
-                        : 'text-[#9ca3af] hover:text-white'
+                        ? 'bg-white dark:bg-[#262626] text-slate-900 dark:text-white border-t border-x border-slate-200 dark:border-[#3e3e3e] relative -bottom-[1px]' 
+                        : 'text-slate-500 dark:text-[#9ca3af] hover:text-slate-900 dark:hover:text-white'
                     }`}
                 >
                     <FileText size={13} className="text-blue-500" />
@@ -224,8 +266,8 @@ export default function PracticePage() {
                     onClick={() => setActiveTab('editorial')}
                     className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-t-md transition-colors ${
                         activeTab === 'editorial' 
-                        ? 'bg-[#262626] text-white border-t border-x border-[#3e3e3e] relative -bottom-[1px]' 
-                        : 'text-[#9ca3af] hover:text-white'
+                        ? 'bg-white dark:bg-[#262626] text-slate-900 dark:text-white border-t border-x border-slate-200 dark:border-[#3e3e3e] relative -bottom-[1px]' 
+                        : 'text-slate-500 dark:text-[#9ca3af] hover:text-slate-900 dark:hover:text-white'
                     }`}
                 >
                     <Code2 size={13} className="text-orange-500" />
@@ -237,23 +279,26 @@ export default function PracticePage() {
             <div className="flex-1 overflow-y-auto custom-scrollbar p-5">
                 {activeTab === 'description' ? (
                     <div className="animate-fadeIn">
-                        <h1 className="text-xl font-bold text-white mb-4">{template.name}</h1>
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-4">{template.name}</h1>
                         <div className="flex gap-2 mb-6">
                             {template.tags.filter(tag => !['Easy', 'Medium', 'Hard'].includes(tag)).map(tag => (
-                                <span key={tag} className="px-2.5 py-0.5 rounded-full bg-[#3e3e3e] text-xs font-medium text-[#9ca3af] border border-[#4a4a4a]">{tag}</span>
+                                <span key={tag} className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-[#3e3e3e] text-xs font-medium text-slate-600 dark:text-[#9ca3af] border border-slate-200 dark:border-[#4a4a4a]">{tag}</span>
                             ))}
                         </div>
                         
-                        <div className="prose prose-invert prose-sm max-w-none text-[#eff1f6] leading-relaxed">
-                            <p className="whitespace-pre-wrap">{template.fullDescription}</p>
+                        <div className="markdown-content">
+                             {/* Manually styled simple content or could re-use ReactMarkdown if imported */}
+                             <div className="prose prose-sm max-w-none text-slate-700 dark:text-[#eff1f6] leading-relaxed whitespace-pre-wrap font-sans">
+                                {template.fullDescription}
+                             </div>
                         </div>
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-[#9ca3af] p-8 text-center">
-                        <div className="bg-[#333] p-4 rounded-full mb-4">
+                    <div className="flex flex-col items-center justify-center h-full text-slate-400 dark:text-[#9ca3af] p-8 text-center">
+                        <div className="bg-slate-100 dark:bg-[#333] p-4 rounded-full mb-4">
                             <Code2 size={24} />
                         </div>
-                        <h3 className="text-white font-medium mb-2">Editorial Locked</h3>
+                        <h3 className="text-slate-900 dark:text-white font-medium mb-2">Editorial Locked</h3>
                         <p className="text-sm">Solve the problem to unlock the official editorial and optimization tips.</p>
                     </div>
                 )}
@@ -262,10 +307,10 @@ export default function PracticePage() {
 
         {/* Vertical Resizer */}
         <div 
-            className={`resizer-v flex items-center justify-center hover:bg-primary-600/50 ${isDraggingH ? 'active bg-primary-600' : ''}`}
+            className={`resizer-v flex items-center justify-center hover:bg-primary-500/50 ${isDraggingH ? 'active bg-primary-600' : ''}`}
             onMouseDown={handleMouseDownH}
         >
-            <div className="w-[2px] h-8 bg-zinc-600 rounded-full"></div>
+            <div className="w-[2px] h-8 bg-slate-300 dark:bg-zinc-600 rounded-full"></div>
         </div>
 
         {/* RIGHT PANEL: Editor & Console */}
@@ -276,22 +321,22 @@ export default function PracticePage() {
         >
             
             {/* Editor Area */}
-            <div className="flex-1 flex flex-col bg-[#262626] rounded-t-lg overflow-hidden border border-[#333]">
+            <div className="flex-1 flex flex-col bg-white dark:bg-[#262626] rounded-t-lg overflow-hidden border border-slate-200 dark:border-[#333]">
                 {/* Editor Tabs */}
-                <div className="h-10 bg-[#333]/30 border-b border-[#3e3e3e] flex items-center justify-between px-2 shrink-0">
+                <div className="h-10 bg-slate-50 dark:bg-[#333]/30 border-b border-slate-200 dark:border-[#3e3e3e] flex items-center justify-between px-2 shrink-0">
                     <div className="flex items-center gap-1">
-                        <div className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-[#1e1e1e] text-white border-t border-x border-[#3e3e3e] rounded-t-md relative -bottom-[1px]">
-                            <span className="text-green-500 text-[10px]">{`</>`}</span>
+                        <div className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-white dark:bg-[#1e1e1e] text-slate-900 dark:text-white border-t border-x border-slate-200 dark:border-[#3e3e3e] rounded-t-md relative -bottom-[1px]">
+                            <span className="text-green-600 dark:text-green-500 text-[10px]">{`</>`}</span>
                             JavaScript
                         </div>
                     </div>
                 </div>
 
                 {/* Code Editor Container */}
-                <div className="flex-1 relative bg-[#1e1e1e] overflow-hidden">
+                <div className="flex-1 relative bg-white dark:bg-[#1e1e1e] overflow-hidden">
                     <Editor
                         height="100%"
-                        theme="vs-dark"
+                        theme={isDarkMode ? "vs-dark" : "light"}
                         defaultLanguage="javascript"
                         language="javascript"
                         value={code}
@@ -305,7 +350,7 @@ export default function PracticePage() {
                             readOnly: false,
                             automaticLayout: true,
                             padding: { top: 16, bottom: 16 },
-                            fontFamily: "'Fira Code', 'Menlo', 'Monaco', 'Courier New', 'monospace'",
+                            fontFamily: "'Fira Code', 'Menlo', 'Monaco', 'Courier New', monospace",
                             cursorBlinking: 'smooth',
                             smoothScrolling: true,
                             contextmenu: true,
@@ -316,54 +361,74 @@ export default function PracticePage() {
 
             {/* Horizontal Resizer */}
             <div 
-                className={`resizer-h w-full flex items-center justify-center hover:bg-primary-600/50 ${isDraggingV ? 'active bg-primary-600' : ''}`}
+                className={`resizer-h w-full flex items-center justify-center hover:bg-primary-500/50 ${isDraggingV ? 'active bg-primary-600' : ''}`}
                 onMouseDown={handleMouseDownV}
             >
-                <div className="h-[2px] w-8 bg-zinc-600 rounded-full"></div>
+                <div className="h-[2px] w-8 bg-slate-300 dark:bg-zinc-600 rounded-full"></div>
             </div>
 
             {/* Console Area */}
             <div 
-                className="flex flex-col bg-[#262626] rounded-b-lg overflow-hidden border border-[#333]"
+                className="flex flex-col bg-white dark:bg-[#262626] rounded-b-lg overflow-hidden border border-slate-200 dark:border-[#333]"
                 style={{ height: `${consoleHeight}%` }}
             >
-                <div className="h-9 bg-[#333]/30 border-b border-[#3e3e3e] flex items-center px-4 justify-between shrink-0">
-                     <div className="flex items-center gap-2 text-[#9ca3af] text-xs font-medium">
+                <div className="h-9 bg-slate-50 dark:bg-[#333]/30 border-b border-slate-200 dark:border-[#3e3e3e] flex items-center px-4 justify-between shrink-0">
+                     <div className="flex items-center gap-2 text-slate-500 dark:text-[#9ca3af] text-xs font-medium">
                         <Terminal size={14} />
                         Test Result
                      </div>
                      {logs.length > 0 && (
-                        <button onClick={() => setLogs([])} className="text-xs text-[#9ca3af] hover:text-white transition-colors">
+                        <button onClick={() => setLogs([])} className="text-xs text-slate-500 hover:text-slate-900 dark:text-[#9ca3af] dark:hover:text-white transition-colors">
                             Clear
                         </button>
                      )}
                 </div>
                 
-                <div className="flex-1 overflow-y-auto p-4 font-mono text-sm bg-[#262626]">
+                <div className="flex-1 overflow-y-auto p-4 font-mono text-sm bg-white dark:bg-[#262626]">
                     {logs.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-[#555]">
+                        <div className="h-full flex flex-col items-center justify-center text-slate-400 dark:text-[#555]">
                             <div className="mb-2 opacity-50">Run code to see output</div>
                         </div>
                     ) : (
                         <div className="space-y-2 pb-4">
-                             {logs.map((log, index) => (
-                                <div key={index} className="animate-fadeIn">
-                                    <div className={`flex items-start gap-2 text-xs mb-1 ${
-                                        log.type === 'error' ? 'text-red-400' : 'text-[#9ca3af]'
-                                    }`}>
-                                        {log.type === 'error' ? <AlertCircle size={12} /> : <CheckCircle2 size={12} />}
-                                        <span>{log.type === 'log' ? 'Standard Output' : 'Runtime Error'}</span>
-                                        <span className="opacity-50 ml-auto">{log.timestamp}</span>
+                            {(() => {
+                                // Find if any error logs exist
+                                const hasError = logs.some(log => log.type === 'error');
+                                // Find the first error index, if any
+                                const firstErrorIdx = logs.findIndex(log => log.type === 'error');
+                                // Determine heading properties
+                                const heading = hasError ? 'Runtime Error' : 'Standard Output';
+                                const icon = hasError ? <AlertCircle size={12} /> : <CheckCircle2 size={12} />;
+                                const textColor = hasError ? 'text-red-500 dark:text-red-400' : 'text-slate-500 dark:text-[#9ca3af]';
+                                // Use earliest error timestamp, otherwise last log timestamp
+                                const timestamp =
+                                    hasError
+                                        ? logs[firstErrorIdx].timestamp
+                                        : logs.length > 0
+                                            ? logs[logs.length - 1].timestamp
+                                            : '';
+
+                                // Choose box styles
+                                const boxClasses = hasError
+                                    ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30 text-red-700 dark:text-red-300'
+                                    : 'bg-slate-100 dark:bg-[#333]/50 border-slate-200 dark:border-[#3e3e3e] text-slate-800 dark:text-[#eff1f6]';
+
+                                // Join log outputs with newlines
+                                const output = logs.map(log => log.content).join('\n');
+
+                                return (
+                                    <div className="animate-fadeIn">
+                                        <div className={`flex items-start gap-2 text-xs mb-1 ${textColor}`}>
+                                            {icon}
+                                            <span>{heading}</span>
+                                            <span className="opacity-50 ml-auto">{timestamp}</span>
+                                        </div>
+                                        <div className={`p-3 rounded-md text-sm border ${boxClasses}`}>
+                                            <pre className="whitespace-pre-wrap font-mono text-xs">{output}</pre>
+                                        </div>
                                     </div>
-                                    <div className={`p-3 rounded-md text-sm border ${
-                                        log.type === 'error' 
-                                            ? 'bg-red-900/10 border-red-900/30 text-red-300' 
-                                            : 'bg-[#333]/50 border-[#3e3e3e] text-[#eff1f6]'
-                                    }`}>
-                                        <pre className="whitespace-pre-wrap font-mono text-xs">{log.content}</pre>
-                                    </div>
-                                </div>
-                            ))}
+                                )
+                            })()}
                         </div>
                     )}
                 </div>
@@ -372,4 +437,4 @@ export default function PracticePage() {
       </div>
     </div>
   );
-};
+}
