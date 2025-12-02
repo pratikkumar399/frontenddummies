@@ -48,7 +48,7 @@ export const INITIAL_TEMPLATES: Template[] = [
     githubUrl: 'https://github.com/pratikkumar399/frontendfordummies/tree/main/src/components/demos/NestedCommentsSystem',
     tags: ['Medium', 'Recursion', 'Data Structures'],
     category: Category.REACT,
-    techStack: ['React', 'Recursion', 'JSON'],
+    techStack: ['React'],
     author: 'modernDev',
     createdAt: '2025-12-02',
   }
