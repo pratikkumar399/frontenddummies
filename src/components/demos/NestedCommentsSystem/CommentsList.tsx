@@ -7,10 +7,10 @@ import { comments as commentsData } from './data/data'
 
 
 export default function CommentsList() {
-
+  
   const [comments, setComments] = useState(commentsData);
 
-  // Recursively add a new comment as a child of the comment with matching id
+
   function addCommentRecursive(commentList: any[], newComment: any, parentId: number): any[] {
     return commentList.map(comment => {
       if (comment.id === parentId) {
@@ -31,7 +31,7 @@ export default function CommentsList() {
 
   function deleteCommentRecursive(commentList: any[], targetId: number): any[] {
     return commentList
-      .filter(comment => comment.id !== targetId)              // remove the target if found at this level
+      .filter(comment => comment.id !== targetId)  // remove the target if found at this level
       .map(comment => {
         if (comment.children && comment.children.length > 0) {
           return {
