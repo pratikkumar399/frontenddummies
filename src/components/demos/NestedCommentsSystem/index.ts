@@ -1,3 +1,3 @@
-import NestedCommentsSystem from './NestedCommentsSystem'
+import CommentsList from './CommentsList'
 
-export { NestedCommentsSystem }
+export { CommentsList }
