@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
 
+import Footer from '@/components/Footer';
+import Navbar from '@/components/Navbar';
 interface AppShellProps {
   children: React.ReactNode;
 }

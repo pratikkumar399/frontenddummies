@@ -64,8 +64,38 @@ a single comment
     - children comments recursively
     - conditionally a reply input field when user clicks reply
 
+Components :
+- CommentList
+- Comment
 
 
+### Step 3 : data flow
+
+ -> there are three flows
+  : reply flow
+  : delete flow
+  : rendering flow
+
+
+  reply flow :
+    - user clicks on the reply button
+    - a new comment input field is shown
+    - when user submits the comment
+     - a new comment object is created
+     - gets inserted in the parent.children
+     - state gets updated
+    - ui re-renders to show the new comment
+
+  delete flow :
+    - user clicks on the delete button
+    - the comment is removed from the tree
+    - state gets updated
+    - ui re-renders to remove the comment
+
+  rendering flow :
+    - CommentList renders the top-level comments.
+    - Each Comment renders itself and recursively renders children.
+    - React handles updates automatically
 `;
 
 

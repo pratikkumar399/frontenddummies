@@ -38,15 +38,15 @@ export const INITIAL_TEMPLATES: Template[] = [
     author: 'JSHero',
     createdAt: '2023-11-02',
     starterCode: DEBOUNCE_THROTTLE_STARTER_CODE
-  }, 
- {
+  },
+  {
     id: '10',
     name: 'Nested Comments System',
     slug: 'nested-comments-system',
     shortDescription: 'Recursive component to display threaded comments like Reddit.',
     fullDescription: NESTED_COMMENTS_MD,
     imageUrl: 'https://picsum.photos/seed/comments/800/600',
-    demoUrl: '#',
+    demoUrl: '/design/nested-comments-system/demo',
     githubUrl: 'https://github.com/pratikkumar399/frontendfordummies/tree/main/src/app/practice/nested-comments-system',
     tags: ['Medium', 'Recursion', 'Data Structures'],
     category: Category.REACT,

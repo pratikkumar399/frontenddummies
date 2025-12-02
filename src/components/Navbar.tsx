@@ -6,7 +6,7 @@ import { PlusCircle, Code2 } from 'lucide-react';
 import { Button } from '@/ui/Button';
 import { usePathname } from 'next/navigation';
 
-export const Navbar: React.FC = () => {
+export default function Navbar() {
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
 
