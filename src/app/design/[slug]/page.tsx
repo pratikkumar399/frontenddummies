@@ -103,6 +103,7 @@ export default async function DetailPage({ params }: PageProps) {
                   className="w-full h-full object-cover opacity-90"
                   priority
                 />
+
               </div>
               
               <ChallengeActions template={template} />

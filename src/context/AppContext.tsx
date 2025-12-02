@@ -29,12 +29,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Initialize Data
   useEffect(() => {
     // Load from local storage or fallback to constants
-    const storedTemplates = localStorage.getItem('uihub_templates');
-    if (storedTemplates) {
-      setTemplates(JSON.parse(storedTemplates));
-    } else {
-      setTemplates(INITIAL_TEMPLATES);
-    }
+    setTemplates(INITIAL_TEMPLATES);
 
     // Check system preference for dark mode
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -52,11 +47,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [isDarkMode]);
 
   // Persist templates when changed
-  useEffect(() => {
-    if (templates.length > 0) {
-      localStorage.setItem('uihub_templates', JSON.stringify(templates));
-    }
-  }, [templates]);
+  // useEffect(() => {
+  //   if (templates.length > 0) {
+  //     localStorage.setItem('uihub_templates', JSON.stringify(templates));
+  //   }
+  // }, [templates]);
 
   const toggleTheme = () => {
     setIsDarkMode(prev => !prev);

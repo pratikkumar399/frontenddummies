@@ -2,6 +2,7 @@ import { Template, Category } from '@/types/types';
 import { JS_OUTPUT_CHALLENGES_SNIPPETS } from '@/data/snippets/js-output-challenges';
 import { DEBOUNCE_THROTTLE_STARTER_CODE } from '@/data/starter-code/debounce-throttle';
 import { NESTED_COMMENTS_MD } from '@/data/markdown/nested-comments';
+import commentsImage from '@/data/assets/comments.png';
 
 export const INITIAL_TEMPLATES: Template[] = [
   {
@@ -12,12 +13,12 @@ export const INITIAL_TEMPLATES: Template[] = [
     fullDescription: 'This collection tests your deep understanding of the JavaScript runtime. You will be presented with snippets of code and asked to predict the console output. These cover topics like Hoisting, Closures, `this` binding, Asynchronous operations, and the Event Loop.',
     imageUrl: 'https://picsum.photos/seed/jspractice/800/600',
     demoUrl: '#',
-    githubUrl: '#',
+    githubUrl: 'https://github.com/pratikkumar399/frontendfordummies/tree/main/src/data/snippets/js-output-challenges',
     tags: ['Tricky', 'Event Loop', 'Closures'],
     category: Category.SNIPPET_PRACTICE,
     techStack: ['JavaScript', 'ES6'],
-    author: 'JSNinja',
-    createdAt: '2023-12-10',
+    author: 'modernDev',
+    createdAt: '2025-12-02',
     snippets: JS_OUTPUT_CHALLENGES_SNIPPETS
   },
   {
@@ -28,12 +29,12 @@ export const INITIAL_TEMPLATES: Template[] = [
     fullDescription: 'A classic JavaScript challenge. Write your own implementation of debounce and throttle functions. \n\nDebounce: Ensures that a function is not called until a certain amount of time has passed since it was last called.\nThrottle: Ensures that a function is called at most once in a specified time period.',
     imageUrl: 'https://picsum.photos/seed/debounce/800/600',
     demoUrl: '#',
-    githubUrl: '#',
+    githubUrl: 'https://github.com/pratikkumar399/frontendfordummies/tree/main/src/data/starter-code/debounce-throttle',
     tags: ['Easy', 'Utilities', 'Logic'],
     category: Category.JAVASCRIPT,
     techStack: ['JavaScript', 'Closures', 'Async'],
     author: 'JSHero',
-    createdAt: '2023-11-02',
+    createdAt: '2025-11-25',
     starterCode: DEBOUNCE_THROTTLE_STARTER_CODE
   },
   {
@@ -42,7 +43,7 @@ export const INITIAL_TEMPLATES: Template[] = [
     slug: 'nested-comments-system',
     shortDescription: 'Recursive component to display threaded comments like Reddit.',
     fullDescription: NESTED_COMMENTS_MD,
-    imageUrl: 'https://picsum.photos/seed/comments/800/600',
+    imageUrl: commentsImage.src,
     demoUrl: '/design/nested-comments-system/demo',
     githubUrl: 'https://github.com/pratikkumar399/frontendfordummies/tree/main/src/components/demos/NestedCommentsSystem',
     tags: ['Medium', 'Recursion', 'Data Structures'],
