@@ -24,6 +24,7 @@ export interface Template {
     createdAt: string;
     starterCode?: string; // Optional starter code for IDE practice mode
     snippets?: Snippet[]; // Optional list of snippets for prediction mode
+    goal?: string; // Optional goal description for the challenge
 }
 
 export enum Category {

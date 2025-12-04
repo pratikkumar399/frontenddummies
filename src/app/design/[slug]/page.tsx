@@ -100,7 +100,7 @@ export default async function DetailPage({ params }: PageProps) {
                   alt={template.name}
                   width={1000}
                   height={1000}
-                  className="w-full h-full object-cover opacity-90"
+                  className="w-full h-full object-contain opacity-90"
                   priority
                 />
 
