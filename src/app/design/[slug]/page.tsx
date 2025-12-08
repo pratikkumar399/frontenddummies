@@ -91,7 +91,7 @@ export default async function DetailPage({ params }: PageProps) {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <div className="lg:col-span-2 space-y-8">
+            <div className="lg:col-span-3 space-y-8">
               <div className="rounded-2xl overflow-hidden border border-dark-border shadow-2xl bg-dark-card aspect-video relative group">
                 <Image
                   src={template.imageUrl} 
@@ -110,9 +110,9 @@ export default async function DetailPage({ params }: PageProps) {
             </div>
 
             {/* Right Column: Meta Info Card */}
-            <div className="space-y-6">
+            {/* <div className="space-y-6">
               <ChallengeStats template={template} />
-            </div>
+            </div> */}
 
           </div>
         </div>

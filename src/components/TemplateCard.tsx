@@ -1,13 +1,31 @@
 import React from 'react';
 import Link from 'next/link';
-import { Template } from '../types/types';
+import { Template, Category } from '../types/types';
 import { Github, ArrowRight, Layers } from 'lucide-react';
 
 interface TemplateCardProps {
   template: Template;
 }
 
+// Helper function to determine the challenge URL
+const getChallengeUrl = (template: Template): string => {
+  // If directToPractice is explicitly set, use it
+  if (template.directToPractice) {
+    // Determine the practice route based on category
+    if (template.category === Category.SNIPPET_PRACTICE && template.snippets?.length) {
+      return `/snippet-practice/${template.slug}`;
+    }
+    if (template.starterCode) {
+      return `/practice/${template.slug}`;
+    }
+  }
+  // Default: go to design page
+  return `/design/${template.slug}`;
+};
+
 export const TemplateCard: React.FC<TemplateCardProps> = ({ template }) => {
+  const challengeUrl = getChallengeUrl(template);
+
   return (
     <div className="group relative flex flex-col h-full bg-[#18181b] rounded-2xl border border-white/5 hover:border-primary-500 transition-all duration-300 hover:shadow-2xl hover:shadow-primary-900/10 hover:-translate-y-1 overflow-hidden">
       
@@ -62,7 +80,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template }) => {
         {/* Footer Actions */}
         <div className="pt-4 mt-auto border-t border-white/5 flex items-center gap-3">
             <Link 
-            href={`/design/${template.slug}`}
+            href={challengeUrl}
             className="flex-1 flex items-center justify-center gap-2 bg-white/5 hover:bg-primary-600 hover:text-white text-zinc-300 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 group/btn border border-white/5 hover:border-primary-500/50 shadow-sm hover:shadow-primary-500/20"
             >
             <span>Start Challenge</span>

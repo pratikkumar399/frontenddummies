@@ -1,0 +1,90 @@
+export const DEBOUNCE_EDITORIAL = `## Solution Approach
+
+### Understanding Debounce
+
+Debounce is a technique that ensures a function only executes after a certain amount of time has passed since it was last called. The key concept is **resetting the timer** on every call.
+
+### Implementation Strategy
+
+1. **Use a closure** to maintain state (the timer ID) between function calls
+2. **Clear the previous timer** on each new call
+3. **Set a new timer** that will execute the function after the delay
+
+### Solution Code
+
+\`\`\`javascript
+function debounce(func, wait) {
+  let timeoutId = null;
+  
+  return function(...args) {
+    // Clear any existing timeout
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    
+    // Set a new timeout
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, wait);
+  };
+}
+\`\`\`
+
+### Key Points
+
+1. **Closure**: The \`timeoutId\` variable is captured in the closure, persisting between calls
+2. **Clearing timeout**: \`clearTimeout\` cancels any pending execution
+3. **Preserving context**: Using \`func.apply(this, args)\` ensures the original \`this\` context and arguments are preserved
+
+### Time Complexity
+- **O(1)** for each call - we're just setting/clearing timeouts
+
+### Space Complexity
+- **O(1)** - we only store one timeout ID
+
+### Common Use Cases
+
+- **Search input**: Wait for user to stop typing before making API call
+- **Window resize**: Wait for resize to finish before recalculating layout
+- **Button clicks**: Prevent accidental double-clicks
+- **Form validation**: Validate after user stops typing
+
+### Edge Cases to Consider
+
+1. What if \`wait\` is 0? The function should still be deferred to the next tick
+2. What if the function throws an error? Consider wrapping in try-catch
+3. What about cancellation? You might want to return a cancel function
+
+### Advanced: Debounce with Leading/Trailing Options
+
+\`\`\`javascript
+function debounce(func, wait, options = {}) {
+  let timeoutId = null;
+  let lastArgs = null;
+  const { leading = false, trailing = true } = options;
+  
+  return function(...args) {
+    lastArgs = args;
+    const shouldCallNow = leading && !timeoutId;
+    
+    if (timeoutId) clearTimeout(timeoutId);
+    
+    timeoutId = setTimeout(() => {
+      timeoutId = null;
+      if (trailing && lastArgs) {
+        func.apply(this, lastArgs);
+      }
+    }, wait);
+    
+    if (shouldCallNow) {
+      func.apply(this, args);
+    }
+  };
+}
+\`\`\`
+
+This advanced version allows:
+- **leading**: Execute immediately on the first call
+- **trailing**: Execute after the delay (default behavior)
+`;
+

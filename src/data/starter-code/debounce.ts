@@ -1,18 +1,10 @@
-export const DEBOUNCE_THROTTLE_STARTER_CODE = `/**
+export const DEBOUNCE_STARTER_CODE = `/**
  * @param {Function} func
  * @param {number} wait
  * @return {Function}
  */
-function debounce(func, wait) {
-  // Your code here
-}
 
-/**
- * @param {Function} func
- * @param {number} wait
- * @return {Function}
- */
-function throttle(func, wait) {
+function debounce(func, wait) {
   // Your code here
 }
 

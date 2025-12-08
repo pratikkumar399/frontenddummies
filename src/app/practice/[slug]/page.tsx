@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import Editor from '@monaco-editor/react';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { LogType, PracticeTab, LogEntry } from '@/types/types';
 import { 
   Play, 
@@ -14,7 +17,9 @@ import {
   FileText, 
   Terminal, 
   CheckCircle2, 
-  AlertCircle
+  AlertCircle,
+  Copy,
+  Check
 } from 'lucide-react';
 
 export default function PracticePage() {
@@ -309,13 +314,62 @@ export default function PracticePage() {
                              </div>
                         </div>
                     </div>
+                ) : template.editorial ? (
+                    <div className="animate-fadeIn">
+                        <h1 className="text-xl font-bold text-white mb-6">Editorial: {template.name}</h1>
+                        <div className="markdown-content prose prose-invert prose-sm max-w-none">
+                            <ReactMarkdown
+                              components={{
+                                h1: ({ children }) => <h1 className="text-2xl font-bold text-white mt-8 mb-4 first:mt-0">{children}</h1>,
+                                h2: ({ children }) => <h2 className="text-xl font-bold text-primary-300 mt-8 mb-4 pb-2 border-b border-[#333]">{children}</h2>,
+                                h3: ({ children }) => <h3 className="text-lg font-semibold text-white mt-6 mb-3">{children}</h3>,
+                                h4: ({ children }) => <h4 className="text-base font-semibold text-white mt-4 mb-2">{children}</h4>,
+                                p: ({ children }) => <p className="text-[#abb2bf] leading-relaxed mb-4">{children}</p>,
+                                ul: ({ children }) => <ul className="list-disc list-inside space-y-2 mb-4 text-[#abb2bf]">{children}</ul>,
+                                ol: ({ children }) => <ol className="list-decimal list-inside space-y-2 mb-4 text-[#abb2bf]">{children}</ol>,
+                                li: ({ children }) => <li className="text-[#abb2bf]">{children}</li>,
+                                strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
+                                em: ({ children }) => <em className="italic text-[#c8ccd4]">{children}</em>,
+                                blockquote: ({ children }) => (
+                                  <blockquote className="border-l-4 border-primary-500 pl-4 py-1 my-4 bg-[#2a2a2a] rounded-r-md">
+                                    {children}
+                                  </blockquote>
+                                ),
+                                hr: () => <hr className="my-6 border-[#333]" />,
+                                a: ({ href, children }) => (
+                                  <a href={href} className="text-primary-400 hover:text-primary-300 underline" target="_blank" rel="noopener noreferrer">
+                                    {children}
+                                  </a>
+                                ),
+                                code({ className, children, ...props }) {
+                                  const match = /language-(\w+)/.exec(className || '');
+                                  const isInline = !match;
+                                  const codeString = String(children).replace(/\n$/, '');
+                                  
+                                  return !isInline ? (
+                                    <EditorialCodeBlock 
+                                       language={match[1]} 
+                                       value={codeString} 
+                                    />
+                                  ) : (
+                                    <code className="bg-[#3e3e3e] px-1.5 py-0.5 rounded text-primary-300 text-sm font-mono" {...props}>
+                                      {children}
+                                    </code>
+                                  );
+                                },
+                              }}
+                            >
+                              {template.editorial}
+                            </ReactMarkdown>
+                        </div>
+                    </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center h-full text-[#9ca3af] p-8 text-center">
                         <div className="bg-[#333] p-4 rounded-full mb-4">
                             <Code2 size={24} />
                         </div>
-                        <h3 className="text-white font-medium mb-2">Editorial Locked</h3>
-                        <p className="text-sm">Solve the problem to unlock the official editorial and optimization tips.</p>
+                        <h3 className="text-white font-medium mb-2">Editorial Coming Soon</h3>
+                        <p className="text-sm">The editorial for this problem is not yet available. Check back later!</p>
                     </div>
                 )}
             </div>
@@ -443,3 +497,39 @@ export default function PracticePage() {
     </>
   );
 }
+
+// Code block component for editorial with copy functionality
+const EditorialCodeBlock = ({ language, value }: { language: string, value: string }) => {
+  const [isCopied, setIsCopied] = useState(false);
+
+  const onCopy = () => {
+    navigator.clipboard.writeText(value);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  return (
+    <div className="relative group my-4">
+      <button
+        onClick={onCopy}
+        className="absolute top-2 right-2 p-2 rounded-md bg-zinc-700/50 bg-zinc-700 text-zinc-400 hover:text-white opacity-0 opacity-100 transition-all duration-200 z-10"
+        title="Copy code"
+      >
+        {isCopied ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
+      </button>
+      <SyntaxHighlighter
+        style={oneDark}
+        language={language}
+        PreTag="div"
+        customStyle={{
+          margin: 0,
+          borderRadius: '0.5rem',
+          fontSize: '0.875rem',
+          padding: '1rem',
+        }}
+      >
+        {value}
+      </SyntaxHighlighter>
+    </div>
+  );
+};

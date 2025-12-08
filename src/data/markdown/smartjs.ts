@@ -62,10 +62,13 @@ const clone1 = { ...obj };
 \`\`\`
 
 ### Deep Clone
-Clones nested objects too, preventing mutations to the original:
+structuredClone creates a true deep copy, handling nested objects, arrays, dates, and more.:
 
 \`\`\`javascript
 const deepClone = structuredClone(obj);
+deepClone.c.d = "new deep hello";
+console.log(obj.c.d); // "new hello"
+console.log(deepClone.c.d); // "new deep hello"
 \`\`\`
 
 ---
@@ -135,5 +138,35 @@ const keys = Object.keys(obj);     // ["a", "b", "c"]
 const values = Object.values(obj); // [1, 2, 3]
 const entries = Object.entries(obj); // [["a", 1], ["b", 2], ["c", 3]]
 \`\`\`
+
+
+## 10. Swap Object Keys and Values
+
+Swap object keys and values using \`Object.entries()\` and \`Object.fromEntries()\`:
+- \`Object.entries()\` returns an array of [key, value] pairs.
+- \`Object.fromEntries()\` creates an object from an array of [key, value] pairs.
+
+
+\`\`\`javascript
+const roles = { admin: 1, user: 2, guest: 3 };
+const swapped = Object.fromEntries(
+    Object.entries(roles).map(([key, value]) => [value, key])
+);
+console.log(swapped); // { 1: "admin", 2: "user", 3: "guest" }
+\`\`\`
+
+## 11. Capitalize First Letter
+This pattern splits text into words, capitalizes the first letter while preserving the rest, then joins them back :
+
+\`\`\`javascript
+const text = 'hello world from javascript';
+const capitalized = text.split(' ')
+  .map(word => word[0].toUpperCase() + word.slice(1))
+  .join(' ');
+console.log(capitalized);
+// 'Hello World From Javascript'
+\`\`\`
+
+12. 
 
 `;

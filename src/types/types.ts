@@ -14,6 +14,7 @@ export interface Template {
     slug: string;
     shortDescription: string;
     fullDescription: string;
+    editorial?: string; // Optional editorial/solution explanation for the challenge
     imageUrl: string;
     demoUrl: string;
     githubUrl: string;
@@ -25,6 +26,7 @@ export interface Template {
     starterCode?: string; // Optional starter code for IDE practice mode
     snippets?: Snippet[]; // Optional list of snippets for prediction mode
     goal?: string; // Optional goal description for the challenge
+    directToPractice?: boolean; // If true, "Start Challenge" goes directly to practice page instead of design page
 }
 
 export enum Category {

@@ -1,9 +1,10 @@
 import { Template, Category } from '@/types/types';
 import { JS_OUTPUT_CHALLENGES_SNIPPETS } from '@/data/snippets/js-output-challenges';
-import { DEBOUNCE_THROTTLE_STARTER_CODE } from '@/data/starter-code/debounce-throttle';
+import { DEBOUNCE_STARTER_CODE } from '@/data/starter-code/debounce';
 import { NESTED_COMMENTS_MD } from '@/data/markdown/nested-comments';
 import commentsImage from '@/data/assets/comments.png';
 import { SMART_JS_MD } from '@/data/markdown/smartjs';
+import { DEBOUNCE_EDITORIAL } from '@/data/editorial/debounce-editorial';
 
 export const INITIAL_TEMPLATES: Template[] = [
   {
@@ -25,10 +26,14 @@ export const INITIAL_TEMPLATES: Template[] = [
   },
   {
     id: '2',
-    name: 'Debounce & Throttle',
-    slug: 'debounce-throttle',
-    shortDescription: 'Implement custom debounce and throttle utility functions from scratch.',
-    fullDescription: 'A classic JavaScript challenge. Write your own implementation of debounce and throttle functions. \n\nDebounce: Ensures that a function is not called until a certain amount of time has passed since it was last called.\nThrottle: Ensures that a function is called at most once in a specified time period.',
+    name: 'Debounce',
+    slug: 'debounce',
+    shortDescription: 'Debouncing lets you control how often a function executes, great for optimizing search bars and rapid-fire events.',
+    fullDescription: `Debouncing is a performance optimization technique that limits how often a function can execute. It delays function execution until after a certain amount of time has passed since the function was last called. Imagine a user typing in a search box - instead of making an API call on every keystroke, debouncing waits until they pause typing.
+    
+The key insight with debouncing is that we reset the timer every time the function is called. Only when the user stops calling the function for the specified delay does the actual execution happen. This is perfect for events that fire rapidly but where you only care about the final state.
+`,
+    editorial: DEBOUNCE_EDITORIAL,
     imageUrl: 'https://picsum.photos/seed/debounce/800/600',
     demoUrl: '#',
     githubUrl: 'https://github.com/pratikkumar399/frontendfordummies/tree/main/src/data/starter-code/debounce-throttle',
@@ -37,8 +42,9 @@ export const INITIAL_TEMPLATES: Template[] = [
     techStack: ['JavaScript', 'Closures', 'Async'],
     author: 'JSHero',
     createdAt: '2025-11-25',
-    starterCode: DEBOUNCE_THROTTLE_STARTER_CODE,
-    goal: 'Implement debounce and throttle functions within 30 minutes. Focus on understanding closures and timing mechanisms.'
+    starterCode: DEBOUNCE_STARTER_CODE,
+    goal: 'Implement debounce and throttle functions within 30 minutes. Focus on understanding closures and timing mechanisms.',
+    directToPractice: true
   },
   {
     id: '3',
