@@ -21,6 +21,7 @@ import {
   Copy,
   Check
 } from 'lucide-react';
+import PageLoader from '@/components/PageLoader';
 
 export default function PracticePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -130,6 +131,15 @@ export default function PracticePage() {
         document.body.classList.remove('select-none');
     };
   }, [isDraggingH, isDraggingV, handleMouseMove, handleMouseUp]);
+
+  if (!templates.length) {
+    return (
+      <PageLoader
+        title="Loading question..."
+        subtitle="Fetching the template..."
+      />
+    );
+  }
 
 
   if (!template) {

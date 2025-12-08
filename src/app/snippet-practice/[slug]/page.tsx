@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Snippet, Template, ButtonSize, ButtonVariant } from '@/types/types';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import PageLoader from '@/components/PageLoader';
 
 export default function SnippetPracticePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -19,6 +20,15 @@ export default function SnippetPracticePage() {
 
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [output, setOutput] = useState<Record<string, string>>({});
+
+  if (!templates.length) {
+    return (
+      <PageLoader
+        title="Loading snippets"
+        subtitle="Fetching the snippet practice set..."
+      />
+    );
+  }
 
   if (!template || !template.snippets) {
      return (
