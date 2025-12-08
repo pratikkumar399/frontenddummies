@@ -51,9 +51,7 @@ export default function PracticePage() {
   // Cleanup console override on unmount
   useEffect(() => {
     return () => {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
       console.log = originalConsoleRef.current.log;
-      // eslint-disable-next-line react-hooks/exhaustive-deps
       console.error = originalConsoleRef.current.error;
       if (cleanupTimerRef.current) clearTimeout(cleanupTimerRef.current);
     };
@@ -186,7 +184,6 @@ export default function PracticePage() {
     try {
       await new Promise(resolve => setTimeout(resolve, 50));
       
-      // eslint-disable-next-line no-new-func
       const func = new Function(code);
       func();
       
