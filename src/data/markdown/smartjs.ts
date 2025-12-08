@@ -167,6 +167,4 @@ console.log(capitalized);
 // 'Hello World From Javascript'
 \`\`\`
 
-12. 
-
 `;
