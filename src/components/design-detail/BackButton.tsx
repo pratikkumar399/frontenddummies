@@ -10,11 +10,7 @@ export const BackButton = () => {
   return (
     <button
       onClick={() => {
-        if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
-          router.back();
-        } else {
-          router.push('/explore');
-        }
+        router.push('/explore');
       }}
       className="inline-flex items-center text-sm text-zinc-400 hover:text-white transition-colors px-3 py-1.5 rounded-md bg-dark-card border border-dark-border hover:bg-dark-accent"
     >

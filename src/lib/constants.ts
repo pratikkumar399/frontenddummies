@@ -5,6 +5,7 @@ import { NESTED_COMMENTS_MD } from '@/data/markdown/nested-comments';
 import commentsImage from '@/data/assets/comments.png';
 import { SMART_JS_MD } from '@/data/markdown/smartjs';
 import { DEBOUNCE_EDITORIAL } from '@/data/editorial/debounce-editorial';
+import { PROMISE_OUTPUT_CHALLENGES_SNIPPETS } from '@/data/snippets/promise-output-challenges';
 
 export const INITIAL_TEMPLATES: Template[] = [
   {
@@ -63,7 +64,7 @@ The key insight with debouncing is that we reset the timer every time the functi
     goal: 'Learn and memorize these JavaScript tips and tricks. Practice using them in your daily coding.'
   },
   {
-    id: '10',
+    id: '4',
     name: 'Nested Comments System',
     slug: 'nested-comments-system',
     shortDescription: 'Recursive component to display threaded comments like Reddit.',
@@ -77,5 +78,22 @@ The key insight with debouncing is that we reset the timer every time the functi
     author: 'modernDev',
     createdAt: '2025-12-02',
     goal: 'Implement a recursive nested comments system within 45-60 minutes. Focus on clean component structure and efficient state management.'
+  },
+  {
+    id: '5',
+    name: 'Promise Output Challenges',
+    slug: 'promise-output-challenges',
+    shortDescription: 'Predict the output of tricky JavaScript snippets involving promises.',
+    fullDescription: 'This collection tests your deep understanding of the JavaScript runtime. You will be presented with snippets of code and asked to predict the console output. These cover topics like Promise executor order, resolve and reject, and the event loop.',
+    imageUrl: 'https://picsum.photos/seed/promise/800/600',
+    demoUrl: '#',
+    githubUrl: 'https://github.com/pratikkumar399/frontendfordummies/tree/main/src/data/snippets/promise-output-challenges.ts',
+    tags: ['Tricky', 'Event Loop', 'Promises'],
+    category: Category.SNIPPET_PRACTICE,
+    techStack: ['JavaScript', 'ES6'],
+    author: 'modernDev',
+    createdAt: '2025-12-02',
+    snippets: PROMISE_OUTPUT_CHALLENGES_SNIPPETS,
+    goal: 'Test your JavaScript knowledge by predicting the correct output for each snippet. Aim for 100% accuracy!'
   }
 ];
