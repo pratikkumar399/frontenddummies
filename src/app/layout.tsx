@@ -78,6 +78,11 @@ export const metadata: Metadata = {
     'google-adsense-account': 'ca-pub-9139551096547240',
     'google-site-verification': 'j-b9jDccBDlDqf9PVxBp303sB2fvZXWZU1OIyoTJSbs',
   },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
 };
 
 export const viewport: Viewport = {
