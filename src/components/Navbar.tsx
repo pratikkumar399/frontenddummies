@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Code2, Terminal } from 'lucide-react';
 import { LinkButton } from '@/components/ui/Button';
 import { ButtonVariant, ButtonSize } from '@/types/types';
+import Image from 'next/image';
 
 export default function Navbar() {
   return (
@@ -12,8 +13,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center ">
           <Link href="/" className="flex items-center gap-3 group cursor-pointer">
-            <div className="w-8 h-8 rounded bg-primary-600 flex items-center justify-center text-white shadow-lg shadow-primary-900/20 cursor-pointer">
-                <Code2 size={20} />
+            <div className="w-8 h-8 rounded-[12px]  cursor-pointer">
+                <img src="/favicon.ico" alt="Frontend Dummies" className="object-contain" />
             </div>
             <span className="font-bold text-lg tracking-tight text-white font-sans group-hover:text-primary-400 transition-colors">
               Frontend<span className="text-primary-400">Dummies</span>
