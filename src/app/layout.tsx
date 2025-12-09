@@ -76,6 +76,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   other: {
     'google-adsense-account': 'ca-pub-9139551096547240',
+    'google-site-verification': 'j-b9jDccBDlDqf9PVxBp303sB2fvZXWZU1OIyoTJSbs',
   },
 };
 
