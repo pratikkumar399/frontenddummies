@@ -26,14 +26,14 @@ const firaCode = Fira_Code({
 export const metadata: Metadata = {
   metadataBase: new URL('https://frontenddummies.vercel.app/'),
   title: {
-    default: "Frontend For Dummies - Master Frontend Development Skills",
-    template: "%s | Frontend For Dummies"
+    default: "Frontend Dummies - Master Frontend Development Skills",
+    template: "%s | Frontend Dummies"
   },
   description: "A comprehensive platform for mastering frontend coding skills, system design, and building real-world projects. Learn React, JavaScript, CSS, algorithms, and ace your interviews.",
   keywords: ["frontend development", "javascript", "react", "coding challenges", "system design", "web development", "interview preparation", "algorithms", "css", "typescript"],
-  authors: [{ name: "Frontend For Dummies Team" }],
-  creator: "Frontend For Dummies",
-  publisher: "Frontend For Dummies",
+  authors: [{ name: "Frontend Dummies Team" }],
+  creator: "pratikrai",
+  publisher: "pratikrai",
   formatDetection: {
     email: false,
     address: false,
@@ -43,24 +43,24 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://frontenddummies.vercel.app/",
-    siteName: "Frontend For Dummies",
-    title: "Frontend For Dummies - Master Frontend Development Skills",
+    siteName: "Frontend Dummies",
+    title: "Frontend Dummies - Master Frontend Development Skills",
     description: "A comprehensive platform for mastering frontend coding skills, system design, and building real-world projects.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Frontend For Dummies Platform",
+        alt: "Frontend Dummies Platform",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Frontend For Dummies - Master Frontend Development Skills",
+    title: "Frontend Dummies - Master Frontend Development Skills",
     description: "A comprehensive platform for mastering frontend coding skills, system design, and building real-world projects.",
     images: ["/og-image.png"],
-    creator: "@frontendfordummies",
+    creator: "@pratikrai",
   },
   robots: {
     index: true,
@@ -74,6 +74,9 @@ export const metadata: Metadata = {
     },
   },
   manifest: '/manifest.json',
+  other: {
+    'google-adsense-account': 'ca-pub-9139551096547240',
+  },
 };
 
 export const viewport: Viewport = {
