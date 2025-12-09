@@ -143,8 +143,8 @@ export default function PlaygroundPage() {
     try {
       await new Promise(resolve => setTimeout(resolve, 50));
       
-      // Wrap in async IIFE to support top-level await
-      const asyncCode = `(async () => { ${code} })()`;
+      // Wrap in async IIFE to support top-level await and guard closing braces from trailing single-line comments
+      const asyncCode = `(async () => {\n${code}\n})()`;
       const func = new Function(asyncCode);
       await func();
       
