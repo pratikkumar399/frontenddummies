@@ -429,6 +429,10 @@ console.log('After promise creation');`,
             "Executor start, After promise creation, Executor end, Timeout in executor, Then: Done"
         ],
         correctAnswer: 0,
-        explanation: `Promise executor runs immediately, logging start and end. setTimeout schedules resolve. After construction, synchronous code logs "After promise creation". Then the timeout fires, logs, resolves, and the queued then microtask logs "Then: Done".`
+        explanation: `This question combines our understanding of synchronous Promise executor execution with asynchronous operations inside that executor. The Promise executor function runs immediately and synchronously when you create the Promise, so "Executor start" prints first, before any other code.
+Inside the executor, we schedule a setTimeout, which registers a macrotask but doesn't execute immediately. The executor then continues synchronously and prints "Executor end". The executor has now completed, but the Promise is still in a pending state because resolve hasn't been called yet - it's scheduled to be called later in the setTimeout.
+The Promise construction is complete, so the synchronous code continues and prints "After promise creation". At this point, the then callback has been registered, but since the Promise is still pending, the callback just waits.
+Now all synchronous code is complete. The event loop checks for microtasks (there are none yet) and then processes the macrotask queue. The setTimeout callback runs, printing "Timeout in executor" and calling resolve. This transitions the Promise to a fulfilled state and schedules the then callback as a microtask.
+`
     }
 ];

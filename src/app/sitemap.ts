@@ -1,3 +1,6 @@
+export const dynamic = 'force-static';
+
+
 import { MetadataRoute } from 'next';
 import { INITIAL_TEMPLATES } from '@/lib/constants';
 
