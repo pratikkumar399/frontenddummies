@@ -36,7 +36,7 @@ export default function ExplorePage() {
     "@type": "CollectionPage",
     "name": "Explore Frontend Challenges",
     "description": "Browse our complete collection of frontend coding challenges, system design problems, and interactive practice exercises.",
-    "url": "https://frontenddummies.vercel.app/explore",
+    "url": "https://www.frontenddummies.com/explore",
     "mainEntity": {
       "@type": "ItemList",
       "numberOfItems": templates.length,
@@ -47,7 +47,7 @@ export default function ExplorePage() {
           "@type": "Course",
           "name": template.name,
           "description": template.shortDescription,
-          "url": `https://frontenddummies.vercel.app/design/${template.slug}`
+          "url": `https://www.frontenddummies.com/design/${template.slug}`
         }
       }))
     },
@@ -58,13 +58,13 @@ export default function ExplorePage() {
           "@type": "ListItem",
           "position": 1,
           "name": "Home",
-          "item": "https://frontenddummies.vercel.app/"
+          "item": "https://www.frontenddummies.com/"
         },
         {
           "@type": "ListItem",
           "position": 2,
           "name": "Explore",
-          "item": "https://frontenddummies.vercel.app/explore"
+          "item": "https://www.frontenddummies.com/explore"
         }
       ]
     }

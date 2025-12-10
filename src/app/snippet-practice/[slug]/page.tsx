@@ -53,7 +53,7 @@ export default function SnippetPracticePage() {
     },
     "datePublished": template.createdAt,
     "numberOfQuestions": template.snippets?.length || 0,
-    "url": `https://frontenddummies.vercel.app/snippet-practice/${template.slug}`,
+    "url": `https://www.frontenddummies.com/snippet-practice/${template.slug}`,
     "inLanguage": "en-US",
     "interactivityType": "active"
   };
