@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import { 
   FileCode, 
@@ -108,39 +108,8 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
 
   const [activeFile, setActiveFile] = useState<FileNode | null>(findFirstFile(files));
   const [copied, setCopied] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(260);
-  const [isResizing, setIsResizing] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
-
-  const startResizing = useCallback(() => {
-    setIsResizing(true);
-  }, []);
-
-  const stopResizing = useCallback(() => {
-    setIsResizing(false);
-  }, []);
-
-  const resize = useCallback(
-    (mouseMoveEvent: MouseEvent) => {
-      if (isResizing) {
-        const newWidth = mouseMoveEvent.clientX;
-        if (newWidth >= 160 && newWidth <= 600) {
-          setSidebarWidth(newWidth);
-        }
-      }
-    },
-    [isResizing]
-  );
-
-  useEffect(() => {
-    window.addEventListener("mousemove", resize);
-    window.addEventListener("mouseup", stopResizing);
-    return () => {
-      window.removeEventListener("mousemove", resize);
-      window.removeEventListener("mouseup", stopResizing);
-    };
-  }, [resize, stopResizing]);
 
   const handleCopy = async () => {
     if (activeFile?.content) {
@@ -182,7 +151,7 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden relative" onMouseUp={stopResizing}>
+      <div className="flex flex-1 overflow-hidden relative">
         {/* Mobile Overlay Backdrop */}
         {isSidebarOpen && (
           <div 
@@ -199,9 +168,9 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
             "fixed inset-y-0 left-0 z-50 h-full transition-transform duration-300 shadow-2xl md:shadow-none",
             isSidebarOpen ? "translate-x-0" : "-translate-x-full",
             "md:relative md:translate-x-0 md:transition-none md:z-0",
-            "!w-[85vw] sm:!w-64 md:!w-auto" // Override inline width style on mobile
+            "!w-[85vw] sm:!w-64 " // Override inline width style on mobile
           )}
-          style={{ width: sidebarWidth }}
+          style={{ width: 360 }}
         >
           <div className="px-4 py-2 text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
             <span>Explorer</span>
@@ -228,12 +197,6 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
                />
              ))}
           </div>
-          
-          {/* Resize Handle */}
-          <div
-            className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary-500/50 transition-colors z-10 hidden md:block"
-            onMouseDown={startResizing}
-          />
         </aside>
 
         {/* Main Content - Editor */}
