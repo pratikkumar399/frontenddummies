@@ -1,4 +1,4 @@
-# Frontend For Dummies
+# Frontend Dummies
 
 A Next.js 16 App Router monorepo project that curates frontend challenges, interactive code practice, snippet-based quizzes, and educational blogs for JavaScript and React.
 
