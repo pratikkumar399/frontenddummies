@@ -7,7 +7,7 @@ import Editor from '@monaco-editor/react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@repo/ui';
 import { LogType, PracticeTab, LogEntry, ButtonVariant, ButtonSize } from '@/types/types';
 import { 
   Play, 

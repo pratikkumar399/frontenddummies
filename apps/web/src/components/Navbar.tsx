@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Code2, Terminal } from 'lucide-react';
-import { LinkButton } from '@/components/ui/Button';
+import { LinkButton } from '@repo/ui';
 import { ButtonVariant, ButtonSize } from '@/types/types';
 import Image from 'next/image';
 

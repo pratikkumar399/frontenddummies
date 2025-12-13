@@ -2,7 +2,7 @@
 
 import { TemplateCard } from '@/components/TemplateCard';
 import { Sparkles, ArrowRight, Code2, Globe, Cpu, Github } from 'lucide-react';
-import { LinkButton } from '@/components/ui/Button';
+import { LinkButton } from '@repo/ui';
 import { useApp } from '@/context/AppContext';
 import { ButtonSize, ButtonVariant } from '@/types/types';
 

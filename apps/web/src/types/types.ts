@@ -1,4 +1,3 @@
-
 export interface Snippet {
     id: string;
     title: string;
@@ -46,7 +45,8 @@ export enum SortOption {
     ALPHABETICAL = 'alphabetical'
 }
 
-// UI Component Types
+// UI Component Types - kept here for backward compatibility
+// New code should import directly from '@repo/ui'
 export enum ButtonVariant {
     PRIMARY = 'primary',
     SECONDARY = 'secondary',

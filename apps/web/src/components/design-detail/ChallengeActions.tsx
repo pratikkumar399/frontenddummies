@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, LinkButton } from '@/components/ui/Button';
+import { Button, LinkButton } from '@repo/ui';
 import { PlayCircle, ExternalLink, Github } from 'lucide-react';
 import { Template, Category, ButtonVariant, ButtonSize } from '@/types/types';
 

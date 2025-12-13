@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { useApp } from '@/context/AppContext';
 import { TemplateCard } from '@/components/TemplateCard';
 import { Category, ButtonVariant, ButtonSize } from '@/types/types';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@repo/ui';
 import { Search, Layers, ChevronRight, Zap, Menu, X } from 'lucide-react';
 
 export default function ExplorePage() {

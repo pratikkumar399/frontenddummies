@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Button, LinkButton } from '@/components/ui/Button';
+import { Button, LinkButton } from '@repo/ui';
 import { ArrowLeft, Github, MonitorPlay, ExternalLink, Code } from 'lucide-react';
 import { InfiniteScrollDemo } from '@/components/demos/InfiniteScrollDemo';
 import { CommentsList } from '@/components/demos/NestedCommentsSystem';

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useApp } from '@/context/AppContext';
 import Editor from '@monaco-editor/react';
 import { LogType, LogEntry, ButtonVariant, ButtonSize } from '@/types/types';
-import { Button, LinkButton } from '@/components/ui/Button';
+import { Button, LinkButton } from '@repo/ui';
 import Link from 'next/link';
 import { 
   Play, 

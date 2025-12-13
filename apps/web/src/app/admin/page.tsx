@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useApp } from '../../context/AppContext';
 import { Category, Template, ButtonVariant } from '@/types/types';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@repo/ui';
 import { Save } from 'lucide-react';
 
 export default function AdminPage() {

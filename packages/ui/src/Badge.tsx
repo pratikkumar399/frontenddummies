@@ -1,5 +1,5 @@
 import React from 'react';
-import { BadgeVariant } from '@/types/types';
+import { BadgeVariant } from './types';
 
 interface BadgeProps {
   children: React.ReactNode;
@@ -23,3 +23,4 @@ export const Badge: React.FC<BadgeProps> = ({ children, variant = BadgeVariant.G
     </span>
   );
 };
+

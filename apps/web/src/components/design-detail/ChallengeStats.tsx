@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '@/components/ui/Badge';
+import { Badge } from '@repo/ui';
 import { User, Calendar, BrainCircuit, Code2, Zap } from 'lucide-react';
 import { Template, BadgeVariant } from '@/types/types';
 

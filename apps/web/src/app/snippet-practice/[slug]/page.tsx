@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';    
 import { useApp } from '@/context/AppContext';
 import { ChevronLeft, Play, CheckCircle2, XCircle, Info } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@repo/ui';
 import { Snippet, Template, ButtonSize, ButtonVariant } from '@/types/types';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';

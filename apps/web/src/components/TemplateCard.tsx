@@ -1,9 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { Template, Category } from '../types/types';
-import { Github, ArrowRight, Layers } from 'lucide-react';
+import {  ArrowRight, Layers } from 'lucide-react';
 
-interface TemplateCardProps {
+interface TemplateCardProps  {
   template: Template;
 }
 
@@ -81,7 +81,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template }) => {
         <div className="pt-4 mt-auto border-t border-white/5 flex items-center gap-3">
             <Link 
             href={challengeUrl}
-            className="flex-1 flex items-center justify-center gap-2 bg-white/5 hover:bg-primary-600 hover:text-white text-zinc-300 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 group/btn border border-white/5 hover:border-primary-500/50 shadow-sm hover:shadow-primary-500/20"
+            className="flex-1 flex items-center justify-center gap-2 bg-white/5 hover:bg-primary-600 hover:text-white text-zinc-300 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 group/btn border border-transparent hover:border-primary-500/50 focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 focus:ring-offset-2 focus:ring-offset-[#18181b] shadow-sm hover:shadow-primary-500/20 focus:outline-none"
             >
             <span>Start Challenge</span>
             <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
