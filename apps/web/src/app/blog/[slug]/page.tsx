@@ -63,12 +63,12 @@ export default async function BlogDetailPage({ params }: PageProps) {
       "name": "Frontend For Dummies",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://frontenddummies.comfavicon.ico"
+        "url": "https://frontenddummies.com/favicon.ico"
       }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://frontenddummies.comblog/${template.slug}`
+      "@id": `https://frontenddummies.com/blog/${template.slug}`
     },
     "keywords": template.tags.join(', '),
     "articleBody": template.fullDescription

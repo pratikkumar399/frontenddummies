@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const title = `${template.name} - Code Practice`;
   const description = `Practice ${template.name} with our interactive code editor. ${template.shortDescription}`;
-  const url = `https://frontenddummies.compractice/${slug}`;
+  const url = `https://frontenddummies.com/practice/${slug}`;
 
   return {
     title,

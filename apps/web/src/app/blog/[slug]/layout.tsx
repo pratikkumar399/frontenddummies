@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const title = `${template.name} - Blog`;
   const description = template.shortDescription;
-  const url = `https://frontenddummies.comblog/${slug}`;
+  const url = `https://frontenddummies.com/blog/${slug}`;
 
   return {
     title,

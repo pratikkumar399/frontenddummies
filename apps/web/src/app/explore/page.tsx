@@ -50,7 +50,7 @@ export default function ExplorePage() {
     "@type": "CollectionPage",
     "name": "Explore Frontend Challenges",
     "description": "Browse our complete collection of frontend coding challenges, system design problems, and interactive practice exercises.",
-    "url": "https://frontenddummies.comexplore",
+    "url": "https://frontenddummies.com/explore",
     "mainEntity": {
       "@type": "ItemList",
       "numberOfItems": templates.length,
@@ -61,7 +61,7 @@ export default function ExplorePage() {
           "@type": "Course",
           "name": template.name,
           "description": template.shortDescription,
-          "url": `https://frontenddummies.comdesign/${template.slug}`
+          "url": `https://frontenddummies.com/design/${template.slug}`
         }
       }))
     },
@@ -72,13 +72,13 @@ export default function ExplorePage() {
           "@type": "ListItem",
           "position": 1,
           "name": "Home",
-          "item": "https://frontenddummies.com"
+          "item": "https://frontenddummies.com/"
         },
         {
           "@type": "ListItem",
           "position": 2,
           "name": "Explore",
-          "item": "https://frontenddummies.comexplore"
+          "item": "https://frontenddummies.com/explore"
         }
       ]
     }

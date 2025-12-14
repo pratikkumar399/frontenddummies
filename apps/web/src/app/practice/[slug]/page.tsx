@@ -175,7 +175,7 @@ export default function PracticePage() {
       "@type": "Person",
       "name": template.author
     },
-    "url": `https://frontenddummies.compractice/${template.slug}`
+    "url": `https://frontenddummies.com/practice/${template.slug}`
   };
 
   const handleRunCode = async () => {

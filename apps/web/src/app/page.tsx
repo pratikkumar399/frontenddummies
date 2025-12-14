@@ -16,10 +16,10 @@ export default function Home() {
     "@type": "WebSite",
     "name": "Frontend For Dummies",
     "description": "A comprehensive platform for mastering frontend coding skills, system design, and building real-world projects.",
-    "url": "https://frontenddummies.com",
+    "url": "https://frontenddummies.com/",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://frontenddummies.comexplore?search={search_term_string}",
+      "target": "https://frontenddummies.com/explore?search={search_term_string}",
       "query-input": "required name=search_term_string"
     },
     "publisher": {
@@ -27,7 +27,7 @@ export default function Home() {
       "name": "Frontend For Dummies",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://frontenddummies.comog-image.png"
+        "url": "https://frontenddummies.com/og-image.png"
       }
     }
   };
@@ -36,8 +36,8 @@ export default function Home() {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "Frontend For Dummies",
-    "url": "https://frontenddummies.com",
-    "logo": "https://frontenddummies.comog-image.png",
+    "url": "https://frontenddummies.com/",
+    "logo": "https://frontenddummies.com/og-image.png",
     "sameAs": [
       "https://github.com/pratikkumar399/frontendfordummies"
     ],

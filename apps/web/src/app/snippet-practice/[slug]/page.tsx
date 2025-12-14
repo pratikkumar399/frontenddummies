@@ -55,7 +55,7 @@ export default function SnippetPracticePage() {
     },
     "datePublished": template.createdAt,
     "numberOfQuestions": template.snippets?.length || 0,
-    "url": `https://frontenddummies.comsnippet-practice/${template.slug}`,
+    "url": `https://frontenddummies.com/snippet-practice/${template.slug}`,
     "inLanguage": "en-US",
     "interactivityType": "active"
   };
