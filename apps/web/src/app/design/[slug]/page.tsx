@@ -105,7 +105,6 @@ export default async function DetailPage({ params }: PageProps) {
               </div>
               
               <ChallengeActions template={template} />
-
               <ChallengeDescription template={template} />
             </div>
 

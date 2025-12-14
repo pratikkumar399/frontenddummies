@@ -3,15 +3,19 @@
 import { useState, useMemo } from 'react';
 import { useApp } from '@/context/AppContext';
 import { TemplateCard } from '@/components/TemplateCard';
+import { TemplateListItem } from '@/components/TemplateListItem';
 import { Category, ButtonVariant, ButtonSize } from '@/types/types';
 import { Button } from '@repo/ui';
-import { Search, Layers, ChevronRight, Zap, Menu, X } from 'lucide-react';
+import { Search, Layers, ChevronRight, Zap, Menu, X, Grid3x3, List } from 'lucide-react';
+
+type ViewMode = 'card' | 'list';
 
 export default function ExplorePage() {
   const { templates } = useApp();
   const [selectedCategory, setSelectedCategory] = useState<Category | 'All'>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
 
   const filteredTemplates = useMemo(() => {
     return templates.filter(t => {
@@ -175,48 +179,80 @@ export default function ExplorePage() {
                     Showing {filteredTemplates.length} {filteredTemplates.length === 1 ? 'result' : 'results'}
                 </p>
 
-                <div className="relative group max-w-md w-full sm:w-80">
-                    <div className="absolute -inset-0.5 bg-primary-600 rounded-lg blur opacity-10 group-hover:opacity-30 transition duration-500"></div>
-                    <div className="relative flex items-center bg-dark-input rounded-lg border border-dark-border">
-                        <div className="pl-3 text-zinc-500">
-                            <Search size={18} />
+                <div className="flex items-center gap-3">
+                    <div className="relative group max-w-md w-full sm:w-80">
+                        <div className="absolute -inset-0.5 bg-primary-600 rounded-lg blur opacity-10 group-hover:opacity-30 transition duration-500"></div>
+                        <div className="relative flex items-center bg-dark-input rounded-lg border border-dark-border">
+                            <div className="pl-3 text-zinc-500">
+                                <Search size={18} />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search challenges..."
+                                className="block w-full px-3 py-2.5 bg-transparent text-white placeholder-zinc-600 focus:outline-none text-sm"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Search challenges..."
-                            className="block w-full px-3 py-2.5 bg-transparent text-white placeholder-zinc-600 focus:outline-none text-sm"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
+                    </div>
+
+                    {/* View Toggle */}
+                    <div className="flex items-center gap-1 p-1 bg-dark-card rounded-lg border border-dark-border">
+                        <Button
+                            onClick={() => setViewMode('card')}
+                            variant={ButtonVariant.GHOST}
+                            size={ButtonSize.SM}
+                            className={`p-2 ${viewMode === 'card' ? 'bg-primary-600/20 text-primary-400' : 'text-zinc-400 hover:text-white'}`}
+                            icon={<Grid3x3 size={18} />}
+                        >
+                            <span className="sr-only">Card view</span>
+                        </Button>
+                        <Button
+                            onClick={() => setViewMode('list')}
+                            variant={ButtonVariant.GHOST}
+                            size={ButtonSize.SM}
+                            className={`p-2 ${viewMode === 'list' ? 'bg-primary-600/20 text-primary-400' : 'text-zinc-400 hover:text-white'}`}
+                            icon={<List size={18} />}
+                        >
+                            <span className="sr-only">List view</span>
+                        </Button>
                     </div>
                 </div>
             </div>
           </div>
 
-          {/* Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredTemplates.length > 0 ? (
-              filteredTemplates.map(template => (
-                <TemplateCard key={template.id} template={template} />
-              ))
-            ) : (
-              <div className="col-span-full py-20 text-center rounded-2xl border border-dashed border-dark-border bg-dark-card/50">
-                <Zap size={48} className="mx-auto text-zinc-700 mb-4" />
-                <h3 className="text-lg font-medium text-white mb-2">No challenges found</h3>
-                <p className="text-zinc-500 mb-6 text-sm max-w-xs mx-auto">
-                  We couldn&apos;t find any challenges matching your search filters.
-                </p>
-                <Button 
-                  onClick={() => {setSearchQuery(''); setSelectedCategory('All');}}
-                  variant={ButtonVariant.GHOST}
-                  size={ButtonSize.SM}
-                  className="text-primary-400 hover:text-primary-300 transition-colors font-medium text-sm border-b border-primary-400/30 hover:border-primary-300"
-                >
-                  Clear all filters
-                </Button>
+          {/* Content Grid/List */}
+          {filteredTemplates.length > 0 ? (
+            viewMode === 'card' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredTemplates.map(template => (
+                  <TemplateCard key={template.id} template={template} />
+                ))}
               </div>
-            )}
-          </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {filteredTemplates.map(template => (
+                  <TemplateListItem key={template.id} template={template} />
+                ))}
+              </div>
+            )
+          ) : (
+            <div className="col-span-full py-20 text-center rounded-2xl border border-dashed border-dark-border bg-dark-card/50">
+              <Zap size={48} className="mx-auto text-zinc-700 mb-4" />
+              <h3 className="text-lg font-medium text-white mb-2">No challenges found</h3>
+              <p className="text-zinc-500 mb-6 text-sm max-w-xs mx-auto">
+                We couldn&apos;t find any challenges matching your search filters.
+              </p>
+              <Button 
+                onClick={() => {setSearchQuery(''); setSelectedCategory('All');}}
+                variant={ButtonVariant.GHOST}
+                size={ButtonSize.SM}
+                className="text-primary-400 hover:text-primary-300 transition-colors font-medium text-sm border-b border-primary-400/30 hover:border-primary-300"
+              >
+                Clear all filters
+              </Button>
+            </div>
+          )}
         </main>
       </div>
     </div>
