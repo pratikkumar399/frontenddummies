@@ -34,7 +34,7 @@ export default async function DemoPage({ params }: PageProps) {
         <div className="flex items-center gap-4">
           <Link 
             href={`/design/${slug}`} 
-            className="p-2 rounded-lg hover:bg-accent text-muted-foreground transition-colors"
+            className="p-2 rounded-lg hover:bg-accent text-muted-foreground transition-colors cursor-pointer"
             title="Back to Details"
           >
             <ArrowLeft size={20} />

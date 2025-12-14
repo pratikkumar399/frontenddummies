@@ -2,7 +2,6 @@ import React from 'react';
 import { getChallengeBySlug } from '@/lib/challenges';
 import { BackButton } from '@/components/design-detail/BackButton';
 import { ChallengeActions } from '@/components/design-detail/ChallengeActions';
-import { ChallengeStats } from '@/components/design-detail/ChallengeStats';
 import { ChallengeDescription } from '@/components/design-detail/ChallengeDescription';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';

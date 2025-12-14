@@ -202,6 +202,25 @@
     @apply bg-background text-foreground;
   }
   
+  /* Global cursor pointer for clickable elements */
+  button,
+  a,
+  [role="button"],
+  [onclick],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"] {
+    cursor: pointer;
+  }
+  
+  /* Disabled buttons should have not-allowed cursor */
+  button:disabled,
+  input[type="button"]:disabled,
+  input[type="submit"]:disabled,
+  input[type="reset"]:disabled {
+    cursor: not-allowed;
+  }
+  
   /* Global focus styles - replace white outlines with green */
   *:focus {
     outline: none;

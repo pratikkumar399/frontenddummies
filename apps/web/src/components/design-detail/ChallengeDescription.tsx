@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-import { Template } from '@/types/types';
+import { Template, ButtonVariant, ButtonSize } from '@/types/types';
 import { Copy, Check } from 'lucide-react';
+import { Button } from '@repo/ui';
 
 interface ChallengeDescriptionProps {
   template: Template;
@@ -62,13 +63,14 @@ const CodeBlock = ({ language, value, style }: { language: string, value: string
 
     return (
         <div className="relative group my-4">
-            <button
+            <Button
                 onClick={onCopy}
+                variant={ButtonVariant.GHOST}
+                size={ButtonSize.SM}
                 className="absolute top-2 right-2 p-2 rounded-md bg-zinc-700/50 hover:bg-zinc-700 text-zinc-400 hover:text-white opacity-0 group-hover:opacity-100 transition-all duration-200"
                 title="Copy code"
-            >
-                {isCopied ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
-            </button>
+                icon={isCopied ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
+            />
             <SyntaxHighlighter
                 style={style}
                 language={language}

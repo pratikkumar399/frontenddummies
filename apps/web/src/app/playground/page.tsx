@@ -340,20 +340,26 @@ export default function PlaygroundPage() {
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 border-r border-[#3e3e3e] pr-2 mr-2">
-                <button
+                <Button
                   onClick={handleUndo}
-                  className="p-1.5 rounded-md text-[#9ca3af] hover:text-white hover:bg-[#3e3e3e] transition-colors"
+                  variant={ButtonVariant.GHOST}
+                  size={ButtonSize.SM}
+                  className="p-1.5 rounded-md text-[#9ca3af] hover:text-white hover:bg-[#3e3e3e]"
                   title="Undo (Ctrl+Z)"
+                  icon={<RotateCcw size={14} />}
                 >
-                  <RotateCcw size={14} />
-                </button>
-                <button
+                  <span className="sr-only">Undo</span>
+                </Button>
+                <Button
                   onClick={handleRedo}
-                  className="p-1.5 rounded-md text-[#9ca3af] hover:text-white hover:bg-[#3e3e3e] transition-colors"
+                  variant={ButtonVariant.GHOST}
+                  size={ButtonSize.SM}
+                  className="p-1.5 rounded-md text-[#9ca3af] hover:text-white hover:bg-[#3e3e3e]"
                   title="Redo (Ctrl+Y)"
+                  icon={<RotateCw size={14} />}
                 >
-                  <RotateCw size={14} />
-                </button>
+                  <span className="sr-only">Redo</span>
+                </Button>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
@@ -411,13 +417,15 @@ export default function PlaygroundPage() {
               Console
             </div>
             {logs.length > 0 && (
-              <button 
+              <Button 
                 onClick={handleClearConsole} 
-                className="flex cursor-pointer items-center gap-1 text-xs text-[#9ca3af] hover:text-white transition-colors"
+                variant={ButtonVariant.GHOST}
+                size={ButtonSize.SM}
+                className="flex items-center gap-1 text-xs text-[#9ca3af] hover:text-white"
+                icon={<Trash2 size={12} />}
               >
-                <Trash2 size={12} />
                 Clear
-              </button>
+              </Button>
             )}
           </div>
           

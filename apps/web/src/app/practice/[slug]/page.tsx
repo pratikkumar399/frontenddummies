@@ -536,20 +536,22 @@ export default function PracticePage() {
                         </div>
                     </div>
                     <div className="flex items-center gap-1">
-                        <button
+                        <Button
                           onClick={handleUndo}
-                          className="p-1.5 rounded-md text-[#9ca3af] hover:text-white hover:bg-[#3e3e3e] transition-colors"
+                          variant={ButtonVariant.GHOST}
+                          size={ButtonSize.SM}
+                          className="p-1.5 rounded-md text-[#9ca3af] hover:text-white hover:bg-[#3e3e3e]"
                           title="Undo (Ctrl+Z)"
-                        >
-                          <RotateCcw size={14} />
-                        </button>
-                        <button
+                          icon={<RotateCcw size={14} />}
+                        />
+                        <Button
                           onClick={handleRedo}
-                          className="p-1.5 rounded-md text-[#9ca3af] hover:text-white hover:bg-[#3e3e3e] transition-colors"
+                          variant={ButtonVariant.GHOST}
+                          size={ButtonSize.SM}
+                          className="p-1.5 rounded-md text-[#9ca3af] hover:text-white hover:bg-[#3e3e3e]"
                           title="Redo (Ctrl+Y)"
-                        >
-                          <RotateCw size={14} />
-                        </button>
+                          icon={<RotateCw size={14} />}
+                        />
                     </div>
                 </div>
 

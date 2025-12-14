@@ -2,6 +2,8 @@
 
 import { useState, memo } from 'react'
 import "../style.css"
+import { Button } from '@repo/ui';
+import { ButtonVariant, ButtonSize } from '@/types/types';
 
 interface Comment {
     id: number;
@@ -43,8 +45,22 @@ const Comments = memo(({ comment, onAddComment, onDeleteComment }: CommentsProps
         <div className="comment-root">
             <div className='comment-text'>{text}</div>
             <div className='comment-actions'>
-                <button onClick={() => setIsReplying(prev => !prev)}>{isReplying ? 'Cancel' : 'Reply'}</button>
-                <button onClick={() => handleDeleteComment(+id)}>Delete</button>
+                <Button 
+                    onClick={() => setIsReplying(prev => !prev)}
+                    variant={ButtonVariant.GHOST}
+                    size={ButtonSize.SM}
+                    className="bg-grey border-2 border-green rounded-[5px] px-[2px] text-black"
+                >
+                    {isReplying ? 'Cancel' : 'Reply'}
+                </Button>
+                <Button 
+                    onClick={() => handleDeleteComment(+id)}
+                    variant={ButtonVariant.GHOST}
+                    size={ButtonSize.SM}
+                    className="bg-grey border-2 border-green rounded-[5px] px-[2px] text-black"
+                >
+                    Delete
+                </Button>
             </div>
 
              {
@@ -57,14 +73,28 @@ const Comments = memo(({ comment, onAddComment, onDeleteComment }: CommentsProps
                             onChange={(e) => setNewComment(e.target.value)}
                             autoFocus
                         />
-                        <button onClick={() => handleAddComment(+id, newComment)}>Add Comment</button>
+                        <Button 
+                            onClick={() => handleAddComment(+id, newComment)}
+                            variant={ButtonVariant.GHOST}
+                            size={ButtonSize.SM}
+                            className="bg-grey border-2 border-green rounded-[5px] px-[3px] text-black"
+                        >
+                            Add Comment
+                        </Button>
                     </div>
                 )
             }
             {
                 children && children?.length > 0 && (
                     <div className='comment-expand'>
-                        <button onClick={() => setCheckReply(prev => !prev)}>{checkReply ? 'Collapse' : 'Expand'}  {children?.length} replies</button>
+                        <Button 
+                            onClick={() => setCheckReply(prev => !prev)}
+                            variant={ButtonVariant.GHOST}
+                            size={ButtonSize.SM}
+                            className="rounded-[5px]"
+                        >
+                            {checkReply ? 'Collapse' : 'Expand'}  {children?.length} replies
+                        </Button>
                     </div>
                 )
             }

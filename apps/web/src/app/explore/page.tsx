@@ -96,8 +96,9 @@ export default function ExplorePage() {
         {/* Mobile Sidebar Overlay */}
         {isSidebarOpen && (
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] md:hidden"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] md:hidden cursor-pointer"
             onClick={() => setIsSidebarOpen(false)}
+            role="button"
           />
         )}
 

@@ -99,7 +99,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
   const dialogContent = (
     <div
-      className="fixed inset-0 flex items-center justify-center p-4"
+      className="fixed inset-0 flex items-center justify-center p-4 cursor-pointer"
       role="dialog"
       aria-modal="true"
       aria-labelledby="dialog-title"
@@ -126,13 +126,16 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           <h2 id="dialog-title" className="text-lg font-bold text-white">
             {title}
           </h2>
-          <button
+          <Button
             onClick={onClose}
-            className="text-[#9ca3af] hover:text-white transition-colors p-1 rounded-md hover:bg-[#333] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50"
+            variant={ButtonVariant.GHOST}
+            size={ButtonSize.SM}
+            className="text-[#9ca3af] hover:text-white p-1 rounded-md hover:bg-[#333]"
             aria-label="Close dialog"
+            icon={<X size={20} />}
           >
-            <X size={20} />
-          </button>
+            <span className="sr-only">Close</span>
+          </Button>
         </div>
 
         {/* Content */}

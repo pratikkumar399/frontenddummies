@@ -20,6 +20,8 @@ import {
 import { FileNode } from '@/lib/code-loader';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { Button } from '@repo/ui';
+import { ButtonVariant, ButtonSize } from '@/types/types';
 
 interface CodeViewerProps {
   files: FileNode[];
@@ -54,6 +56,7 @@ const FileTreeItem = ({
           className="flex items-center gap-1.5 py-1 px-2 hover:bg-accent cursor-pointer text-foreground select-none transition-colors"
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
           onClick={() => setIsOpen(!isOpen)}
+          role="button"
         >
           {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
           {isOpen ? <FolderOpen size={16} className="text-primary-300" /> : <Folder size={16} className="text-primary-300" />}
@@ -132,15 +135,18 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
       {/* Top Bar */}
       <header className="flex items-center justify-between px-4 py-2 bg-card border-b border-border h-12 shrink-0">
         <div className="flex items-center gap-4">
-          <button 
-            className="md:hidden p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+          <Button 
+            variant={ButtonVariant.GHOST}
+            size={ButtonSize.SM}
+            className="md:hidden p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            icon={<Menu size={18} />}
           >
-            <Menu size={18} />
-          </button>
+            <span className="sr-only">Menu</span>
+          </Button>
            <Link 
             href={`/design/${slug}/demo`} 
-            className="p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+            className="p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             title="Back to Demo"
           >
             <ArrowLeft size={18} />
@@ -155,8 +161,9 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
         {/* Mobile Overlay Backdrop */}
         {isSidebarOpen && (
           <div 
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            className="fixed inset-0 bg-black/50 z-40 md:hidden cursor-pointer"
             onClick={() => setIsSidebarOpen(false)}
+            role="button"
           />
         )}
 
@@ -174,12 +181,15 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
         >
           <div className="px-4 py-2 text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
             <span>Explorer</span>
-            <button 
+            <Button 
+              variant={ButtonVariant.GHOST}
+              size={ButtonSize.SM}
               className="md:hidden p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground"
               onClick={() => setIsSidebarOpen(false)}
+              icon={<X size={14} />}
             >
-              <X size={14} />
-            </button>
+              <span className="sr-only">Close</span>
+            </Button>
           </div>
           <div className="flex-1 overflow-y-auto py-2">
              <div className="mb-2 px-2 text-xs font-bold text-primary-400 uppercase tracking-wider">
@@ -209,8 +219,10 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
                   {getFileIcon(activeFile.name)}
                   <span className="truncate">{activeFile.name}</span>
                 </div>
-                <button
+                <Button
                   onClick={handleCopy}
+                  variant={copied ? ButtonVariant.PRIMARY : ButtonVariant.GHOST}
+                  size={ButtonSize.SM}
                   className={cn(
                     "flex items-center gap-2 px-3 py-1 mr-2 rounded text-xs font-medium transition-all duration-200",
                     copied 
@@ -218,19 +230,10 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
                       : "bg-accent hover:bg-card text-muted-foreground border border-transparent"
                   )}
                   title="Copy Code"
+                  icon={copied ? <Check size={14} /> : <Copy size={14} />}
                 >
-                  {copied ? (
-                    <>
-                      <Check size={14} />
-                      <span>Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy size={14} />
-                      <span>Copy</span>
-                    </>
-                  )}
-                </button>
+                  {copied ? 'Copied!' : 'Copy'}
+                </Button>
               </>
             ) : <div />}
           </div>

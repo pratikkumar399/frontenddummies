@@ -140,16 +140,21 @@ export default function SnippetPracticePage() {
       
       {/* Header */}
       <nav className="sticky w-[80%] mx-auto top-0 z-40 h-16 flex justify-center items-center px-4 sm:px-6 lg:px-8">
-        <button onClick={() => {
-          if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
-            router.back();
-          } else {
-            router.push(`/design/${slug}`);
-          }
-        }} className="flex items-center gap-2 text-[#9ca3af] hover:text-white transition-colors">
-            <ChevronLeft size={20} />
-            <span className="font-medium">Back</span>
-        </button>
+        <Button 
+          onClick={() => {
+            if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+              router.back();
+            } else {
+              router.push(`/design/${slug}`);
+            }
+          }} 
+          variant={ButtonVariant.GHOST}
+          size={ButtonSize.SM}
+          className="flex items-center gap-2 text-[#9ca3af] hover:text-white"
+          icon={<ChevronLeft size={20} />}
+        >
+          <span className="font-medium">Back</span>
+        </Button>
         <div className="h-6 w-[1px] bg-[#444] mx-4"></div>
         <h1 className="text-lg font-bold truncate text-white">{template.name}</h1>
       </nav>
@@ -224,18 +229,20 @@ export default function SnippetPracticePage() {
                                     }
 
                                     return (
-                                        <button
+                                        <Button
                                             key={optIdx}
                                             onClick={() => !isAnswered && handleSelectOption(snippet.id, optIdx)}
                                             disabled={isAnswered}
+                                            variant={ButtonVariant.OUTLINE}
+                                            size={ButtonSize.MD}
                                             className={`relative px-4 py-3 rounded-lg text-left text-sm font-medium border transition-all duration-200 ${stateClass}`}
                                         >
-                                            <div className="flex items-center justify-between">
+                                            <div className="flex items-center justify-between w-full">
                                                 <span>{option}</span>
                                                 {isAnswered && optIdx === snippet.correctAnswer && <CheckCircle2 size={16} className="text-green-500" />}
                                                 {isAnswered && optIdx === userAns && optIdx !== snippet.correctAnswer && <XCircle size={16} className="text-red-500" />}
                                             </div>
-                                        </button>
+                                        </Button>
                                     );
                                 })}
                             </div>
