@@ -5,6 +5,7 @@ import "./globals.css";
 import { Providers } from "@/app/providers";
 import { AppShell } from "@/components/AppShell";
 import { PWARegister } from "@/components/PWARegister";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -130,6 +131,18 @@ export default function RootLayout({
         <Providers>
           <AppShell>{children}</AppShell>
         </Providers>
+        <Toaster
+          position="top-center"
+          containerClassName="!z-[9999]"
+          toastOptions={{
+            className: '',
+            style: {
+              background: '#262626',
+              color: '#eff1f6',
+              border: '1px solid #333',
+            },
+          }}
+        />
       </body>
     </html>
   );

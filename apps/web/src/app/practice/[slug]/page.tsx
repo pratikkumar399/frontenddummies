@@ -3,15 +3,17 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams, usePathname, useParams } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
-import Editor from '@monaco-editor/react';
+import Editor, { OnMount } from '@monaco-editor/react';
+import type { editor } from 'monaco-editor';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-import { Button } from '@repo/ui';
+import { Button, ConfirmDialog } from '@repo/ui';
 import { LogType, PracticeTab, LogEntry, ButtonVariant, ButtonSize } from '@/types/types';
 import { 
   Play, 
   RotateCcw, 
+  RotateCw,
   ChevronLeft, 
   Code2, 
   FileText, 
@@ -24,6 +26,7 @@ import {
 import PageLoader from '@/components/PageLoader';
 import { validateCode, sanitizeError } from '@/lib/code-execution';
 import { checkRateLimit } from '@/lib/rate-limiter';
+import { showToast } from '@/lib/toast';
 
 export default function PracticePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -37,6 +40,10 @@ export default function PracticePage() {
   const [code, setCode] = useState('');
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isRunning, setIsRunning] = useState(false);
+  
+  // Confirmation dialogs
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [showClearDialog, setShowClearDialog] = useState(false);
 
   const [activeTab, setActiveTab] = useState<PracticeTab>(PracticeTab.DESCRIPTION);
 
@@ -60,6 +67,9 @@ export default function PracticePage() {
   
   const originalConsoleRef = useRef({ log: console.log, error: console.error });
   const cleanupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
 
   // Initialize Code
   useEffect(() => {
@@ -187,13 +197,15 @@ export default function PracticePage() {
     // Check rate limit
     const rateLimit = checkRateLimit('practice');
     if (!rateLimit.allowed) {
+      const errorMsg = `Rate limit exceeded. Please wait ${rateLimit.retryAfter} seconds before running code again.`;
       setLogs([{
         type: LogType.ERROR,
-        content: `Rate limit exceeded. Please wait ${rateLimit.retryAfter} seconds before running code again.`,
+        content: errorMsg,
         timestamp: new Date().toLocaleTimeString()
       }]);
       setIsRunning(false);
       if (consoleHeight < 20) setConsoleHeight(35);
+      showToast.error(errorMsg);
       return;
     }
     
@@ -232,13 +244,15 @@ export default function PracticePage() {
     // Validate code before execution
     const validation = validateCode(code);
     if (!validation.isValid) {
+      const errorMsg = validation.error || 'Code validation failed';
       setLogs(prev => [...prev, {
         type: LogType.ERROR,
-        content: validation.error || 'Code validation failed',
+        content: errorMsg,
         timestamp: new Date().toLocaleTimeString()
       }]);
       setIsRunning(false);
       if (consoleHeight < 20) setConsoleHeight(35);
+      showToast.error(errorMsg);
       return;
     }
 
@@ -252,12 +266,16 @@ export default function PracticePage() {
       const func = new Function(code);
       func();
       
+      // Show success toast if execution completed without errors
+      showToast.success('Code executed successfully');
     } catch (err: unknown) {
+      const errorMsg = sanitizeError(err);
       setLogs(prev => [...prev, {
         type: LogType.ERROR,
-        content: sanitizeError(err),
+        content: errorMsg,
         timestamp: new Date().toLocaleTimeString()
       }]);
+      showToast.error(`Runtime error: ${errorMsg}`);
     } finally {
       setIsRunning(false);
       if (consoleHeight < 20) setConsoleHeight(35);
@@ -266,6 +284,46 @@ export default function PracticePage() {
           console.log = originalConsoleRef.current.log;
           console.error = originalConsoleRef.current.error;
       }, 5000);
+    }
+  };
+
+  const handleEditorMount: OnMount = (editor) => {
+    editorRef.current = editor;
+    
+    // Update undo/redo state periodically
+    const updateUndoRedoState = () => {
+      if (editor && editor.getModel()) {
+        // Monaco doesn't expose canUndo/canRedo directly, so we'll enable buttons
+        // and let Monaco handle the actual undo/redo state internally
+        // For better UX, we'll enable undo if there have been changes
+        const model = editor.getModel();
+        if (model) {
+          // Simple heuristic: enable undo if model has content changes
+          // Monaco will handle the actual undo/redo correctly
+          setCanUndo(true); // Always enable - Monaco handles state
+          setCanRedo(true); // Always enable - Monaco handles state
+        }
+      }
+    };
+    
+    // Update on content change
+    editor.onDidChangeModelContent(() => {
+      updateUndoRedoState();
+    });
+    
+    // Initial state
+    updateUndoRedoState();
+  };
+
+  const handleUndo = () => {
+    if (editorRef.current) {
+      editorRef.current.trigger('keyboard', 'undo', {});
+    }
+  };
+
+  const handleRedo = () => {
+    if (editorRef.current) {
+      editorRef.current.trigger('keyboard', 'redo', {});
     }
   };
 
@@ -302,7 +360,7 @@ export default function PracticePage() {
         
         <div className="flex items-center gap-3">
              <Button 
-                onClick={() => setCode(template.starterCode || '')}
+                onClick={() => setShowResetDialog(true)}
                 variant={ButtonVariant.GHOST}
                 size={ButtonSize.SM}
                 className="p-1.5 text-[#9ca3af] hover:bg-[#3e3e3e]"
@@ -311,6 +369,20 @@ export default function PracticePage() {
              >
                 Reset Code
              </Button>
+             
+             <ConfirmDialog
+               isOpen={showResetDialog}
+               onClose={() => setShowResetDialog(false)}
+               onConfirm={() => {
+                 setCode(template.starterCode || '');
+                 setShowResetDialog(false);
+                 showToast.info('Code reset to starter code');
+               }}
+               title="Reset Code"
+               message="Are you sure you want to reset the code to starter code? This will clear all your current changes."
+               confirmText="Reset"
+               cancelText="Cancel"
+             />
              
              <Button 
                 onClick={handleRunCode} 
@@ -463,6 +535,22 @@ export default function PracticePage() {
                             JavaScript
                         </div>
                     </div>
+                    <div className="flex items-center gap-1">
+                        <button
+                          onClick={handleUndo}
+                          className="p-1.5 rounded-md text-[#9ca3af] hover:text-white hover:bg-[#3e3e3e] transition-colors"
+                          title="Undo (Ctrl+Z)"
+                        >
+                          <RotateCcw size={14} />
+                        </button>
+                        <button
+                          onClick={handleRedo}
+                          className="p-1.5 rounded-md text-[#9ca3af] hover:text-white hover:bg-[#3e3e3e] transition-colors"
+                          title="Redo (Ctrl+Y)"
+                        >
+                          <RotateCw size={14} />
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex-1 relative bg-[#1e1e1e] overflow-hidden">
@@ -473,6 +561,7 @@ export default function PracticePage() {
                         language="javascript"
                         value={code}
                         onChange={(value) => setCode(value || '')}
+                        onMount={handleEditorMount}
                         options={{
                             minimap: { enabled: false },
                             fontSize: 14,
@@ -508,14 +597,29 @@ export default function PracticePage() {
                         Test Result
                      </div>
                      {logs.length > 0 && (
-                        <Button 
-                          onClick={() => setLogs([])} 
-                          variant={ButtonVariant.GHOST} 
-                          size={ButtonSize.SM} 
-                          className="text-xs text-[#9ca3af] hover:text-white bg-transparent hover:bg-transparent px-2 py-1"
-                        >
-                            Clear
-                        </Button>
+                        <>
+                          <Button 
+                            onClick={() => setShowClearDialog(true)} 
+                            variant={ButtonVariant.GHOST} 
+                            size={ButtonSize.SM} 
+                            className="text-xs text-[#9ca3af] hover:text-white bg-transparent hover:bg-transparent px-2 py-1"
+                          >
+                              Clear
+                          </Button>
+                          <ConfirmDialog
+                            isOpen={showClearDialog}
+                            onClose={() => setShowClearDialog(false)}
+                            onConfirm={() => {
+                              setLogs([]);
+                              setShowClearDialog(false);
+                              showToast.success('Console cleared');
+                            }}
+                            title="Clear Console"
+                            message="Are you sure you want to clear all console output? This action cannot be undone."
+                            confirmText="Clear"
+                            cancelText="Cancel"
+                          />
+                        </>
                      )}
                 </div>
                 
@@ -576,6 +680,7 @@ const EditorialCodeBlock = ({ language, value }: { language: string, value: stri
   const onCopy = () => {
     navigator.clipboard.writeText(value);
     setIsCopied(true);
+    showToast.success('Code copied to clipboard');
     setTimeout(() => setIsCopied(false), 2000);
   };
 

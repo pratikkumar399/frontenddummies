@@ -8,10 +8,12 @@ A Next.js 16 App Router monorepo project that curates frontend challenges, inter
 - **Explore** – Search + category filters to browse every challenge  
 - **Blogs** – Educational content and guides (`/blog`)  
 - **Challenge Detail** – `/design/[slug]` with description, tags, demo/code links, and SEO metadata  
-- **Practice IDE** – `/practice/[slug]` Monaco editor with resizable panes, console capture, reset, and optional editorial tab  
+- **Practice IDE** – `/practice/[slug]` Monaco editor with resizable panes, console capture, reset, undo/redo, and optional editorial tab  
 - **Snippet Quizzes** – `/snippet-practice/[slug]` run-the-code output predictions with MCQ answers and explanations  
+- **JavaScript Playground** – `/playground` standalone code editor with console output, rate limiting, and code validation  
 - **Demos** – e.g. nested comments system demo at `/design/nested-comments-system/demo`  
-- **Always-on dark theme**, structured JSON-LD per page, and loading states
+- **PWA Support** – Service worker, web app manifest, and offline capabilities  
+- **Always-on dark theme**, structured JSON-LD per page, loading states, and toast notifications
 
 ## Tech Stack
 
@@ -19,6 +21,9 @@ A Next.js 16 App Router monorepo project that curates frontend challenges, inter
 - **Framework**: Next.js 16 (App Router) + React 19 + TypeScript  
 - **Styling**: Tailwind CSS v4 (global tokens in `src/app/globals.css`, `tw-animate-css`, `tailwind-merge`)  
 - **Editor**: Monaco editor, `react-markdown`, `react-syntax-highlighter`, `lucide-react`
+- **UI Components**: Custom shared components via `@repo/ui` (Button, Badge, ConfirmDialog, LinkButton)
+- **Notifications**: `react-hot-toast` for toast notifications
+- **PWA**: Service worker and web app manifest for offline support
 - **Package Manager**: npm workspaces with Turborepo
 
 ## Monorepo Structure
@@ -52,7 +57,9 @@ frontendfordummies/
 - `/design/[slug]` – Challenge detail page  
 - `/practice/[slug]` – In-browser IDE for starter code + logs  
 - `/snippet-practice/[slug]` – Output-prediction quizzes  
-- `/playground` – JavaScript playground  
+- `/playground` – Standalone JavaScript playground with console output  
+- `/privacy` – Privacy policy page  
+- `/site-map` – Site map page  
 - `/design/nested-comments-system/demo` – Live demo example
 
 ## Project Structure
@@ -84,7 +91,10 @@ frontendfordummies/
 │           │   └── editorial/*.ts       // solution writeups
 │           ├── lib/
 │           │   ├── constants.ts           // INITIAL_TEMPLATES seed data
-│           │   └── challenges.ts          // lookup helpers
+│           │   ├── challenges.ts          // lookup helpers
+│           │   ├── code-execution.ts      // code validation & execution
+│           │   ├── rate-limiter.ts       // client-side rate limiting
+│           │   └── toast.ts               // toast notification helpers
 │           └── context/
 │               └── AppContext.tsx         // template store + theme
 └── packages/
@@ -92,6 +102,8 @@ frontendfordummies/
         └── src/
             ├── Button.tsx                 // Shared button component
             ├── Badge.tsx                  // Shared badge component
+            ├── ConfirmDialog.tsx          // Confirmation dialog component
+            ├── LinkButton.tsx             // Link button component
             └── index.ts                   // Package exports
 ```
 
@@ -186,21 +198,45 @@ npm run clean
 
 ## Features
 
+### Code Execution & Playground
+- **Monaco Editor**: Full-featured code editor with syntax highlighting, autocomplete, and IntelliSense
+- **Console Capture**: Intercept and display `console.log`, `console.error`, `console.warn`, and `console.info` output
+- **Code Validation**: Client-side code validation and error sanitization
+- **Rate Limiting**: Client-side rate limiting for code execution (localStorage-based)
+- **Resizable Panes**: Drag-to-resize editor and console panels
+- **Undo/Redo**: Full editor undo/redo support
+- **Code Reset**: Reset to default or starter code with confirmation dialogs
+
 ### Responsive Design
 - Mobile-first responsive navbar with icon-only buttons on small screens
 - Adaptive layouts for all pages
 - Touch-friendly interactions
+- Resizable editor/console layout
+
+### PWA Support
+- Service worker registration for offline capabilities
+- Web app manifest with icons and theme colors
+- Automatic service worker updates
+- Installable as a Progressive Web App
 
 ### SEO & Performance
 - Structured data (JSON-LD) on all pages for better search visibility
 - Optimized images and lazy loading
 - Fast builds with Turborepo caching
+- Sitemap and robots.txt generation
 
 ### Developer Experience
 - Type-safe cross-package imports
-- Shared UI components in `@repo/ui`
+- Shared UI components in `@repo/ui` (Button, Badge, ConfirmDialog, LinkButton)
 - Hot module replacement in development
 - Consistent code style with ESLint
+- Toast notifications for user feedback
+
+### Current Status
+- **Client-Side Only**: All data is currently hardcoded in `apps/web/src/lib/constants.ts`
+- **No Backend**: No database, authentication, or user accounts yet
+- **No Persistence**: Code solutions and progress are not saved across sessions
+
 
 ## Notes
 
@@ -209,6 +245,8 @@ npm run clean
 - **Styling**: Tailwind v4 utilities live in `globals.css` with custom CSS variables for colors/radii
 - **Monorepo**: Uses Turborepo for build orchestration - see `turbo.json` for task configuration
 - **Categories**: Only categories with content are shown in the explore page sidebar
+- **Rate Limiting**: Currently client-side only (localStorage-based); server-side rate limiting planned for backend implementation
+- **Data Storage**: All challenges, blogs, and content are hardcoded in TypeScript files; no database yet
 
 
 Made with ❤️ by [@pratikrai](https://github.com/pratikkumar399)

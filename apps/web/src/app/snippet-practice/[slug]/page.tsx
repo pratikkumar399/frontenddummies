@@ -13,6 +13,7 @@ import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import PageLoader from '@/components/PageLoader';
 import { validateCode, sanitizeError } from '@/lib/code-execution';
 import { checkRateLimit } from '@/lib/rate-limiter';
+import { showToast } from '@/lib/toast';
 
 export default function SnippetPracticePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -64,14 +65,16 @@ export default function SnippetPracticePage() {
     // Check rate limit
     const rateLimit = checkRateLimit('snippet-practice');
     if (!rateLimit.allowed) {
+      const errorMsg = `Rate limit exceeded. Please wait ${rateLimit.retryAfter} seconds before running code again.`;
       queueMicrotask(() => {
         setTimeout(() => {
           setOutput(prev => ({ 
             ...prev, 
-            [id]: `Rate limit exceeded. Please wait ${rateLimit.retryAfter} seconds before running code again.` 
+            [id]: errorMsg
           }));
         }, 150);
       });
+      showToast.error(errorMsg);
       return;
     }
 
@@ -82,11 +85,13 @@ export default function SnippetPracticePage() {
     // Validate code before execution
     const validation = validateCode(code);
     if (!validation.isValid) {
+      const errorMsg = validation.error || 'Code validation failed';
       queueMicrotask(() => {
         setTimeout(() => {
-          setOutput(prev => ({ ...prev, [id]: `Error: ${validation.error || 'Code validation failed'}` }));
+          setOutput(prev => ({ ...prev, [id]: `Error: ${errorMsg}` }));
         }, 150);
       });
+      showToast.error(errorMsg);
       return;
     }
 
@@ -100,7 +105,9 @@ export default function SnippetPracticePage() {
         const fn = new Function(code);
         fn();
     } catch (e: unknown) {
-        logs.push(sanitizeError(e));
+        const errorMsg = sanitizeError(e);
+        logs.push(errorMsg);
+        showToast.error(`Runtime error: ${errorMsg}`);
     }
 
     queueMicrotask(() => {
@@ -108,7 +115,13 @@ export default function SnippetPracticePage() {
             console.log = originalLog;
             console.error = originalError;
             
-            setOutput(prev => ({ ...prev, [id]: logs.join('\n') || 'No output' }));
+            const output = logs.join('\n') || 'No output';
+            setOutput(prev => ({ ...prev, [id]: output }));
+            
+            // Show success toast if no errors
+            if (!logs.some(log => log.includes('Error:'))) {
+              showToast.success('Snippet executed successfully');
+            }
         }, 150);
     });
   };

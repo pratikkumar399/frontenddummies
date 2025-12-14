@@ -2,13 +2,15 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useApp } from '@/context/AppContext';
-import Editor from '@monaco-editor/react';
+import Editor, { OnMount } from '@monaco-editor/react';
+import type { editor } from 'monaco-editor';
 import { LogType, LogEntry, ButtonVariant, ButtonSize } from '@/types/types';
-import { Button, LinkButton } from '@repo/ui';
+import { Button, LinkButton, ConfirmDialog } from '@repo/ui';
 import Link from 'next/link';
 import { 
   Play, 
   RotateCcw, 
+  RotateCw,
   Terminal, 
   CheckCircle2, 
   AlertCircle,
@@ -18,6 +20,7 @@ import {
 } from 'lucide-react';
 import { validateCode, sanitizeError } from '@/lib/code-execution';
 import { checkRateLimit } from '@/lib/rate-limiter';
+import { showToast } from '@/lib/toast';
 
 const DEFAULT_CODE = `// Welcome to JS Playground!
 // Write your JavaScript code here and click Run to execute.
@@ -35,6 +38,10 @@ export default function PlaygroundPage() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   
+  // Confirmation dialogs
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [showClearDialog, setShowClearDialog] = useState(false);
+  
   // Resizable Layout State
   const [editorWidth, setEditorWidth] = useState(60);
   const [isDragging, setIsDragging] = useState(false);
@@ -42,14 +49,16 @@ export default function PlaygroundPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const originalConsoleRef = useRef({ log: console.log, error: console.error, warn: console.warn, info: console.info });
   const cleanupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 
   // Cleanup console override on unmount
   useEffect(() => {
+    const originalConsole = originalConsoleRef.current;
     return () => {
-      console.log = originalConsoleRef.current.log;
-      console.error = originalConsoleRef.current.error;
-      console.warn = originalConsoleRef.current.warn;
-      console.info = originalConsoleRef.current.info;
+      console.log = originalConsole.log;
+      console.error = originalConsole.error;
+      console.warn = originalConsole.warn;
+      console.info = originalConsole.info;
       if (cleanupTimerRef.current) clearTimeout(cleanupTimerRef.current);
     };
   }, []);
@@ -98,12 +107,14 @@ export default function PlaygroundPage() {
     // Check rate limit
     const rateLimit = checkRateLimit('playground');
     if (!rateLimit.allowed) {
+      const errorMsg = `Rate limit exceeded. Please wait ${rateLimit.retryAfter} seconds before running code again.`;
       setLogs([{
         type: LogType.ERROR,
-        content: `Rate limit exceeded. Please wait ${rateLimit.retryAfter} seconds before running code again.`,
+        content: errorMsg,
         timestamp: new Date().toLocaleTimeString()
       }]);
       setIsRunning(false);
+      showToast.error(errorMsg);
       return;
     }
     
@@ -151,12 +162,14 @@ export default function PlaygroundPage() {
     // Validate code before execution
     const validation = validateCode(code);
     if (!validation.isValid) {
+      const errorMsg = validation.error || 'Code validation failed';
       setLogs(prev => [...prev, {
         type: LogType.ERROR,
-        content: validation.error || 'Code validation failed',
+        content: errorMsg,
         timestamp: new Date().toLocaleTimeString()
       }]);
       setIsRunning(false);
+      showToast.error(errorMsg);
       return;
     }
 
@@ -174,12 +187,16 @@ export default function PlaygroundPage() {
       const func = new Function(asyncCode);
       await func();
       
+      // Show success toast if execution completed without errors
+      showToast.success('Code executed successfully');
     } catch (err: unknown) {
+      const errorMsg = sanitizeError(err);
       setLogs(prev => [...prev, {
         type: LogType.ERROR,
-        content: sanitizeError(err),
+        content: errorMsg,
         timestamp: new Date().toLocaleTimeString()
       }]);
+      showToast.error(`Runtime error: ${errorMsg}`);
     } finally {
       setIsRunning(false);
       
@@ -193,12 +210,40 @@ export default function PlaygroundPage() {
   };
 
   const handleReset = () => {
+    setShowResetDialog(true);
+  };
+
+  const handleConfirmReset = () => {
     setCode(DEFAULT_CODE);
     setLogs([]);
+    setShowResetDialog(false);
+    showToast.info('Code reset to default');
   };
 
   const handleClearConsole = () => {
+    setShowClearDialog(true);
+  };
+
+  const handleConfirmClear = () => {
     setLogs([]);
+    setShowClearDialog(false);
+    showToast.success('Console cleared');
+  };
+
+  const handleEditorMount: OnMount = (editor) => {
+    editorRef.current = editor;
+  };
+
+  const handleUndo = () => {
+    if (editorRef.current) {
+      editorRef.current.trigger('keyboard', 'undo', {});
+    }
+  };
+
+  const handleRedo = () => {
+    if (editorRef.current) {
+      editorRef.current.trigger('keyboard', 'redo', {});
+    }
   };
 
   const getLogIcon = (type: LogType) => {
@@ -293,10 +338,28 @@ export default function PlaygroundPage() {
               <span className="text-green-500 text-[10px]">{`</>`}</span>
               JavaScript
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
-              <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-              <div className="w-3 h-3 rounded-full bg-[#27ca40]"></div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 border-r border-[#3e3e3e] pr-2 mr-2">
+                <button
+                  onClick={handleUndo}
+                  className="p-1.5 rounded-md text-[#9ca3af] hover:text-white hover:bg-[#3e3e3e] transition-colors"
+                  title="Undo (Ctrl+Z)"
+                >
+                  <RotateCcw size={14} />
+                </button>
+                <button
+                  onClick={handleRedo}
+                  className="p-1.5 rounded-md text-[#9ca3af] hover:text-white hover:bg-[#3e3e3e] transition-colors"
+                  title="Redo (Ctrl+Y)"
+                >
+                  <RotateCw size={14} />
+                </button>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                <div className="w-3 h-3 rounded-full bg-[#27ca40]"></div>
+              </div>
             </div>
           </div>
 
@@ -308,6 +371,7 @@ export default function PlaygroundPage() {
               language="javascript"
               value={code}
               onChange={(value) => setCode(value || '')}
+              onMount={handleEditorMount}
               options={{
                 minimap: { enabled: false },
                 fontSize: 14,
@@ -385,6 +449,27 @@ export default function PlaygroundPage() {
           </div>
         </div>
       </div>
+      
+      {/* Confirmation Dialogs */}
+      <ConfirmDialog
+        isOpen={showResetDialog}
+        onClose={() => setShowResetDialog(false)}
+        onConfirm={handleConfirmReset}
+        title="Reset Code"
+        message="Are you sure you want to reset the code to default? This will clear all your current changes."
+        confirmText="Reset"
+        cancelText="Cancel"
+      />
+      
+      <ConfirmDialog
+        isOpen={showClearDialog}
+        onClose={() => setShowClearDialog(false)}
+        onConfirm={handleConfirmClear}
+        title="Clear Console"
+        message="Are you sure you want to clear all console output? This action cannot be undone."
+        confirmText="Clear"
+        cancelText="Cancel"
+      />
     </div>
   );
 }
