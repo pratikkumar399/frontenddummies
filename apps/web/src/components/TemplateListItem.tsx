@@ -1,8 +1,11 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Template, Category } from '../types/types';
 import { ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface TemplateListItemProps {
   template: Template;
@@ -29,9 +32,12 @@ const getChallengeUrl = (template: Template): string => {
 
 export const TemplateListItem: React.FC<TemplateListItemProps> = ({ template }) => {
   const challengeUrl = getChallengeUrl(template);
+  const router = useRouter();
 
   return (
-    <div className="group relative flex flex-col sm:flex-row items-stretch sm:items-center gap-4 p-4 bg-[#18181b] rounded-[12px] border border-white/5 hover:border-primary-500 transition-all duration-300 hover:shadow-lg hover:shadow-primary-900/10">
+    <div className="group relative flex flex-col sm:flex-row items-stretch sm:items-center gap-4 p-4 bg-[#18181b] rounded-[12px] border border-white/5 hover:border-primary-500 transition-all duration-300 hover:shadow-lg hover:shadow-primary-900/10 cursor-pointer"
+    onClick={() => router.push(challengeUrl)}
+    >
       {/* Image */}
       <div className="flex-shrink-0 w-full sm:w-32 h-32 sm:h-20 rounded-xl overflow-hidden bg-[#202022] relative" style={{ borderRadius: '0.75rem' }}>
         <Image 

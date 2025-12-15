@@ -1,8 +1,11 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Template, Category } from '../types/types';
 import {  ArrowRight, Layers } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface TemplateCardProps  {
   template: Template;
@@ -30,9 +33,14 @@ const getChallengeUrl = (template: Template): string => {
 
 export const TemplateCard: React.FC<TemplateCardProps> = ({ template }) => {
   const challengeUrl = getChallengeUrl(template);
+  const router = useRouter()
 
   return (
-    <div className="group relative flex flex-col h-full bg-[#18181b] rounded-2xl border border-white/5 hover:border-primary-500 transition-all duration-300 hover:shadow-2xl hover:shadow-primary-900/10 hover:-translate-y-1 overflow-hidden">
+    <div className="group relative flex flex-col h-full bg-[#18181b] rounded-2xl border border-white/5 hover:border-primary-500 transition-all duration-300 hover:shadow-2xl hover:shadow-primary-900/10 hover:-translate-y-1 overflow-hidden cursor-pointer"
+    onClick={() => 
+      router.push(challengeUrl)
+    }
+    >
       
       {/* Image Area */}
       <div className="relative h-48 overflow-hidden bg-[#202022]">
@@ -92,16 +100,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template }) => {
             <span>{template.category === Category.BLOGS ? 'Read Blog' : 'Start Challenge'}</span>
             <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
             </Link>
-            
-            {/* <a 
-                href={template.githubUrl} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="p-2.5 rounded-lg bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 border border-white/5 transition-colors group/icon"
-                title="View Source on GitHub"
-            >
-                <Github size={18} className="transition-transform group-hover/icon:scale-110" />
-            </a> */}
+
         </div>
       </div>
     </div>
