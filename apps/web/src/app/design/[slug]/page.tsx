@@ -2,7 +2,7 @@ import React from 'react';
 import { getChallengeBySlug } from '@/lib/challenges';
 import { BackButton } from '@/components/design-detail/BackButton';
 import { ChallengeActions } from '@/components/design-detail/ChallengeActions';
-import { ChallengeDescription } from '@/components/design-detail/ChallengeDescription';
+import { ChallengeDescriptionServer } from '@/components/design-detail/ChallengeDescriptionServer';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
@@ -105,7 +105,7 @@ export default async function DetailPage({ params }: PageProps) {
               </div>
               
               <ChallengeActions template={template} />
-              <ChallengeDescription template={template} />
+              <ChallengeDescriptionServer template={template} />
             </div>
 
             {/* Right Column: Meta Info Card */}

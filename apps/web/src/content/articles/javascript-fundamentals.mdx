@@ -1,4 +1,3 @@
-export const JAVASCRIPT_FUNDAMENTALS_MD = `
 # JavaScript Basics and Language Fundamentals
 
 *A deep, practical guide to how JavaScript actually works*
@@ -19,25 +18,25 @@ JavaScript has **seven primitive types** and **one non-primitive category**.
 
 Primitive values are **immutable** and **stored by value**.
 
-1. \`number\`
-2. \`string\`
-3. \`boolean\`
-4. \`undefined\`
-5. \`null\`
-6. \`symbol\`
-7. \`bigint\`
+1. `number`
+2. `string`
+3. `boolean`
+4. `undefined`
+5. `null`
+6. `symbol`
+7. `bigint`
 
 Example:
 
-\`\`\`js
+```js
 let a = 10;
 let b = a;
 b = 20;
 
 console.log(a); // 10
-\`\`\`
+```
 
-Here, \`a\` and \`b\` hold independent copies of the value.
+Here, `a` and `b` hold independent copies of the value.
 
 ### Non-Primitive Types
 
@@ -51,13 +50,13 @@ Non-primitives are **objects**, including:
 
 They are **stored by reference**.
 
-\`\`\`js
+```js
 let obj1 = { x: 10 };
 let obj2 = obj1;
 
 obj2.x = 20;
 console.log(obj1.x); // 20
-\`\`\`
+```
 
 Both variables point to the same memory location.
 
@@ -66,50 +65,50 @@ Primitive types copy values. Objects copy references.
 
 ---
 
-## 2. \`var\`, \`let\`, and \`const\`
+## 2. `var`, `let`, and `const`
 
-### \`var\`
+### `var`
 
 * Function-scoped
-* Hoisted and initialized with \`undefined\`
+* Hoisted and initialized with `undefined`
 * Can be re-declared and re-assigned
 
-\`\`\`js
+```js
 console.log(a); // undefined
 var a = 10;
-\`\`\`
+```
 
-This behavior is a common source of bugs and is why \`var\` is largely avoided today.
+This behavior is a common source of bugs and is why `var` is largely avoided today.
 
-### \`let\`
+### `let`
 
 * Block-scoped
 * Hoisted but not initialized
 * Can be re-assigned but not re-declared in the same scope
 
-\`\`\`js
+```js
 let x = 10;
 x = 20; // allowed
-\`\`\`
+```
 
-### \`const\`
+### `const`
 
 * Block-scoped
 * Must be initialized
 * Cannot be re-assigned
 
-\`\`\`js
+```js
 const y = 10;
 // y = 20; ❌ error
-\`\`\`
+```
 
 Important clarification:
-\`const\` does **not** make objects immutable.
+`const` does **not** make objects immutable.
 
-\`\`\`js
+```js
 const user = { name: "A" };
 user.name = "B"; // allowed
-\`\`\`
+```
 
 It only prevents reassignment of the reference.
 
@@ -131,111 +130,111 @@ What does not get hoisted:
 
 Example:
 
-\`\`\`js
+```js
 console.log(a); // undefined
 var a = 10;
-\`\`\`
+```
 
 This is effectively treated as:
 
-\`\`\`js
+```js
 var a;
 console.log(a);
 a = 10;
-\`\`\`
+```
 
 Function declarations are fully hoisted:
 
-\`\`\`js
+```js
 sayHello();
 
 function sayHello() {
   console.log("Hello");
 }
-\`\`\`
+```
 
 Function expressions are not:
 
-\`\`\`js
+```js
 sayHi(); // error
 
 const sayHi = () => {};
-\`\`\`
+```
 
 ---
 
 ## 4. Temporal Dead Zone (TDZ)
 
-The **Temporal Dead Zone** is the time between entering a scope and initializing a \`let\` or \`const\` variable.
+The **Temporal Dead Zone** is the time between entering a scope and initializing a `let` or `const` variable.
 
-\`\`\`js
+```js
 console.log(a); // ReferenceError
 let a = 10;
-\`\`\`
+```
 
 The variable exists in memory, but it cannot be accessed.
 
 Why TDZ exists:
 
 * To prevent accessing variables before they are properly initialized
-* To avoid bugs that \`var\` introduced
+* To avoid bugs that `var` introduced
 
 TDZ enforces safer coding practices.
 
 ---
 
-## 5. \`null\` vs \`undefined\`
+## 5. `null` vs `undefined`
 
-### \`undefined\`
+### `undefined`
 
 * Means a variable exists but has no value
 * Assigned automatically by JavaScript
 
-\`\`\`js
+```js
 let a;
 console.log(a); // undefined
-\`\`\`
+```
 
-### \`null\`
+### `null`
 
 * Explicitly assigned
 * Represents intentional absence of value
 
-\`\`\`js
+```js
 let b = null;
-\`\`\`
+```
 
 Key difference:
 
-* \`undefined\` is a default state
-* \`null\` is an intentional decision
+* `undefined` is a default state
+* `null` is an intentional decision
 
 ---
 
-## 6. \`==\` vs \`===\`
+## 6. `==` vs `===`
 
-### \`==\` (Loose Equality)
+### `==` (Loose Equality)
 
 * Performs type coercion
 * Compares values after conversion
 
-\`\`\`js
+```js
 0 == "0";      // true
 false == 0;    // true
 null == undefined; // true
-\`\`\`
+```
 
-### \`===\` (Strict Equality)
+### `===` (Strict Equality)
 
 * No type coercion
 * Compares both type and value
 
-\`\`\`js
+```js
 0 === "0"; // false
-\`\`\`
+```
 
 Rule of thumb:
-Use \`===\` unless you have a very specific reason not to.
+Use `===` unless you have a very specific reason not to.
 
 Loose equality introduces implicit conversions that are hard to reason about.
 
@@ -247,94 +246,94 @@ Type coercion is JavaScript automatically converting values from one type to ano
 
 ### String coercion
 
-\`\`\`js
+```js
 "5" + 1; // "51"
-\`\`\`
+```
 
 ### Numeric coercion
 
-\`\`\`js
+```js
 "5" - 1; // 4
-\`\`\`
+```
 
 ### Boolean coercion
 
 Falsy values:
 
-* \`false\`
-* \`0\`
-* \`""\`
-* \`null\`
-* \`undefined\`
-* \`NaN\`
+* `false`
+* `0`
+* `""`
+* `null`
+* `undefined`
+* `NaN`
 
 Everything else is truthy.
 
-\`\`\`js
+```js
 if ("0") {
   // this runs
 }
-\`\`\`
+```
 
 Understanding coercion is critical for writing predictable conditions.
 
 ---
 
-## 8. \`typeof\` Quirks
+## 8. `typeof` Quirks
 
-The \`typeof\` operator is useful but imperfect.
+The `typeof` operator is useful but imperfect.
 
-\`\`\`js
+```js
 typeof 10;        // "number"
 typeof "a";       // "string"
 typeof true;      // "boolean"
 typeof undefined; // "undefined"
 typeof function(){}; // "function"
-\`\`\`
+```
 
 The famous bug:
 
-\`\`\`js
+```js
 typeof null; // "object"
-\`\`\`
+```
 
 This is a historical bug in JavaScript that cannot be fixed without breaking the web.
 
 Correct way to check null:
 
-\`\`\`js
+```js
 value === null;
-\`\`\`
+```
 
 ---
 
-## 9. \`NaN\` and Edge Cases
+## 9. `NaN` and Edge Cases
 
-\`NaN\` stands for Not a Number.
+`NaN` stands for Not a Number.
 
-\`\`\`js
+```js
 Number("abc"); // NaN
-\`\`\`
+```
 
 Important properties:
 
-\`\`\`js
+```js
 NaN === NaN; // false
-\`\`\`
+```
 
 To check NaN:
 
-\`\`\`js
+```js
 Number.isNaN(value);
-\`\`\`
+```
 
 Avoid:
 
-\`\`\`js
+```js
 isNaN("abc"); // true (coerces first)
-\`\`\`
+```
 
-Always prefer \`Number.isNaN\`.
+Always prefer `Number.isNaN`.
 
 ---
 
@@ -344,7 +343,7 @@ JavaScript technically uses **pass by value**, but the value for objects is a re
 
 ### Primitive example
 
-\`\`\`js
+```js
 function change(x) {
   x = 20;
 }
@@ -352,11 +351,11 @@ function change(x) {
 let a = 10;
 change(a);
 console.log(a); // 10
-\`\`\`
+```
 
 ### Object example
 
-\`\`\`js
+```js
 function change(obj) {
   obj.x = 20;
 }
@@ -364,7 +363,7 @@ function change(obj) {
 let o = { x: 10 };
 change(o);
 console.log(o.x); // 20
-\`\`\`
+```
 
 The reference is copied, not the object itself.
 
@@ -376,19 +375,19 @@ The reference is copied, not the object itself.
 
 Copies only the first level.
 
-\`\`\`js
+```js
 const obj = { a: 1, b: { c: 2 } };
 const copy = { ...obj };
 
 copy.b.c = 5;
 console.log(obj.b.c); // 5
-\`\`\`
+```
 
 Methods that create shallow copies:
 
 * Spread operator
-* \`Object.assign\`
-* \`Array.slice\`
+* `Object.assign`
+* `Array.slice`
 
 ### Deep Copy
 
@@ -396,9 +395,9 @@ Creates a completely independent copy.
 
 Common approaches:
 
-\`\`\`js
+```js
 JSON.parse(JSON.stringify(obj));
-\`\`\`
+```
 
 Limitations:
 
@@ -408,9 +407,7 @@ Limitations:
 
 Better approach:
 
-* \`structuredClone\` (modern browsers)
-* Libraries like \`lodash.cloneDeep\`
-
-`;
+* `structuredClone` (modern browsers)
+* Libraries like `lodash.cloneDeep`
 
 

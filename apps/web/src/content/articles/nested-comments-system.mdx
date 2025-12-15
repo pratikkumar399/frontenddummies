@@ -1,4 +1,3 @@
-export const NESTED_COMMENTS_MD = `
 # Nested Comments System
 
 Design a component that renders a tree of comments. Each comment can have replies, and those replies can have replies (n-levels deep). There will be an option to add a new comment and also delete a comment.
@@ -15,7 +14,7 @@ Design a component that renders a tree of comments. Each comment can have replie
 ### Step 1: Architecture Design
 
 - Store the comments in a tree-like structure.
-  - Each comment has: \`id\`, \`text\`, and \`children\`.
+  - Each comment has: `id`, `text`, and `children`.
 - The entire comment list is an array of root-level comments.
 - Each comment may contain nested levels of comments.
 
@@ -23,7 +22,7 @@ Basically, we will maintain the comments as a tree of objects, where each node r
 
 **Sample Data Structure:**
 
-\`\`\`js
+```js
 const comments = [
   {
     id: 1,
@@ -42,7 +41,7 @@ const comments = [
     ]
   }
 ];
-\`\`\`
+```
 
 ### Step 2: Component Structure
 
@@ -55,8 +54,8 @@ const comments = [
    - Conditionally, a reply input field when the user clicks reply.
 
 **Components:**
-- \`CommentList\`
-- \`Comment\`
+- `CommentList`
+- `Comment`
 
 ### Step 3: Data Flow
 
@@ -70,7 +69,7 @@ There are three main flows:
 - A new comment input field is shown.
 - When user submits the comment:
   - A new comment object is created.
-  - It gets inserted in \`parent.children\`.
+  - It gets inserted in `parent.children`.
   - State gets updated.
 - UI re-renders to show the new comment.
 
@@ -81,7 +80,8 @@ There are three main flows:
 - UI re-renders to remove the comment.
 
 **Rendering Flow:**
-- \`CommentList\` renders the top-level comments.
-- Each \`Comment\` renders itself and recursively renders children.
+- `CommentList` renders the top-level comments.
+- Each `Comment` renders itself and recursively renders children.
 - React handles updates automatically.
-`;
+
+

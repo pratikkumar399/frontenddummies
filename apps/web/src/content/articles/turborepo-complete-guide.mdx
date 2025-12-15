@@ -1,4 +1,3 @@
-export const TURBOREPO_MD = `
 # Turborepo Documentation
 
 ## What is Turborepo?
@@ -51,8 +50,8 @@ Turborepo is a high-performance build system for JavaScript and TypeScript monor
 
 1. **Monorepo Structure**: Your project should already be organized as a monorepo with:
    - Multiple packages/apps in separate directories
-   - A root \`package.json\` with workspaces configured
-   - Individual \`package.json\` files in each package/app
+   - A root `package.json` with workspaces configured
+   - Individual `package.json` files in each package/app
 
 2. **Node.js Version**: Ensure you're using Node.js 18+ (this project uses Node.js 20+)
 
@@ -60,19 +59,19 @@ Turborepo is a high-performance build system for JavaScript and TypeScript monor
 
 #### Step 1: Install Turborepo
 
-\`\`\`bash
+```bash
 npm install turbo --save-dev
 # or
 yarn add turbo -D
 # or
 pnpm add turbo -D
-\`\`\`
+```
 
-#### Step 2: Create \`turbo.json\`
+#### Step 2: Create `turbo.json`
 
-Create a \`turbo.json\` file in your repository root. This file defines your task pipeline:
+Create a `turbo.json` file in your repository root. This file defines your task pipeline:
 
-\`\`\`json
+```json
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
@@ -94,13 +93,13 @@ Create a \`turbo.json\` file in your repository root. This file defines your tas
     }
   }
 }
-\`\`\`
+```
 
-#### Step 3: Update Root \`package.json\` Scripts
+#### Step 3: Update Root `package.json` Scripts
 
 Replace your existing scripts with Turborepo commands:
 
-\`\`\`json
+```json
 {
   "scripts": {
     "dev": "turbo run dev",
@@ -110,13 +109,13 @@ Replace your existing scripts with Turborepo commands:
     "clean": "turbo run clean && rm -rf node_modules"
   }
 }
-\`\`\`
+```
 
 #### Step 4: Keep Individual Package Scripts
 
 Your individual packages should keep their original scripts. Turborepo will execute these:
 
-\`\`\`json
+```json
 // apps/web/package.json
 {
   "scripts": {
@@ -126,13 +125,13 @@ Your individual packages should keep their original scripts. Turborepo will exec
     "lint": "eslint"
   }
 }
-\`\`\`
+```
 
 #### Step 5: Configure TypeScript Paths (if needed)
 
 If you're using shared packages, configure TypeScript path mappings:
 
-\`\`\`json
+```json
 // apps/web/tsconfig.json
 {
   "compilerOptions": {
@@ -142,11 +141,11 @@ If you're using shared packages, configure TypeScript path mappings:
     }
   }
 }
-\`\`\`
+```
 
 #### Step 6: Test Your Setup
 
-\`\`\`bash
+```bash
 # Run all dev servers
 npm run dev
 
@@ -155,15 +154,15 @@ npm run build
 
 # Lint all packages
 npm run lint
-\`\`\`
+```
 
 ### Migration Checklist
 
 - [ ] Install Turborepo as a dev dependency
-- [ ] Create \`turbo.json\` configuration file
-- [ ] Update root \`package.json\` scripts to use \`turbo run\`
+- [ ] Create `turbo.json` configuration file
+- [ ] Update root `package.json` scripts to use `turbo run`
 - [ ] Ensure individual package scripts remain unchanged
-- [ ] Configure task dependencies in \`turbo.json\`
+- [ ] Configure task dependencies in `turbo.json`
 - [ ] Set up output directories for caching
 - [ ] Test all tasks (dev, build, lint, etc.)
 - [ ] Verify parallel execution works correctly
@@ -175,7 +174,7 @@ npm run lint
 
 This project uses Turborepo with the following structure:
 
-\`\`\`
+```text
 frontendfordummies/
 ├── apps/
 │   └── web/              # Next.js application
@@ -183,13 +182,13 @@ frontendfordummies/
 │   └── ui/               # Shared UI components
 ├── turbo.json            # Turborepo configuration
 └── package.json          # Root package with workspaces
-\`\`\`
+```
 
 ### Configuration Details
 
-#### Root \`package.json\`
+#### Root `package.json`
 
-\`\`\`json
+```json
 {
   "workspaces": [
     "apps/*",
@@ -210,16 +209,16 @@ frontendfordummies/
     "node": ">=20"
   }
 }
-\`\`\`
+```
 
 **Key Points:**
 - Uses npm workspaces to manage monorepo packages
 - All scripts delegate to Turborepo
 - Requires Node.js 20+ and npm 10.0.0
 
-#### \`turbo.json\` Configuration
+#### `turbo.json` Configuration
 
-\`\`\`json
+```json
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
@@ -241,47 +240,47 @@ frontendfordummies/
     }
   }
 }
-\`\`\`
+```
 
 **Task Configuration Explained:**
 
-1. **\`build\` Task:**
-   - \`dependsOn: ["^build"]\`: Waits for dependencies to build first (the \`^\` means dependencies)
-   - \`outputs\`: Specifies what to cache (\`.next\` for Next.js, \`dist\` for other packages)
-   - Excludes \`.next/cache/**\` from caching (Next.js internal cache)
+1. **`build` Task:**
+   - `dependsOn: ["^build"]`: Waits for dependencies to build first (the `^` means dependencies)
+   - `outputs`: Specifies what to cache (`.next` for Next.js, `dist` for other packages)
+   - Excludes `.next/cache/**` from caching (Next.js internal cache)
 
-2. **\`lint\` Task:**
-   - \`dependsOn: ["^lint"]\`: Lints dependencies first
+2. **`lint` Task:**
+   - `dependsOn: ["^lint"]`: Lints dependencies first
    - No outputs specified (linting doesn't produce files to cache)
 
-3. **\`dev\` Task:**
-   - \`cache: false\`: Development servers shouldn't be cached
-   - \`persistent: true\`: Indicates a long-running process
+3. **`dev` Task:**
+   - `cache: false`: Development servers shouldn't be cached
+   - `persistent: true`: Indicates a long-running process
 
-4. **\`start\` Task:**
-   - \`cache: false\`: Production servers shouldn't be cached
-   - \`persistent: true\`: Long-running process
+4. **`start` Task:**
+   - `cache: false`: Production servers shouldn't be cached
+   - `persistent: true`: Long-running process
 
-5. **\`globalDependencies\`:**
-   - \`["**/.env.*local"]\`: Changes to \`.env.local\` files invalidate all caches
+5. **`globalDependencies`:**
+   - `["**/.env.*local"]`: Changes to `.env.local` files invalidate all caches
 
 #### Package Structure
 
-**Apps (\`apps/web\`):**
+**Apps (`apps/web`):**
 - Next.js application
-- Uses \`@repo/ui\` package from the monorepo
+- Uses `@repo/ui` package from the monorepo
 - Has its own build, dev, and lint scripts
 
-**Packages (\`packages/ui\`):**
+**Packages (`packages/ui`):**
 - Shared UI component library
-- Exported as \`@repo/ui\`
-- Can be imported in apps using: \`import { Button } from "@repo/ui"\`
+- Exported as `@repo/ui`
+- Can be imported in apps using: `import { Button } from "@repo/ui"`
 
 #### TypeScript Configuration
 
-The web app's \`tsconfig.json\` includes path mappings for the shared package:
+The web app's `tsconfig.json` includes path mappings for the shared package:
 
-\`\`\`json
+```json
 {
   "compilerOptions": {
     "paths": {
@@ -290,43 +289,44 @@ The web app's \`tsconfig.json\` includes path mappings for the shared package:
     }
   }
 }
-\`\`\`
+```
 
 This allows importing shared components directly:
-\`\`\`typescript
+
+```typescript
 import { Button } from "@repo/ui";
-\`\`\`
+```
 
 ### How It Works in This Project
 
 1. **Development:**
-   \`\`\`bash
+   ```bash
    npm run dev
-   \`\`\`
-   - Turborepo runs \`dev\` scripts in parallel
+   ```
+   - Turborepo runs `dev` scripts in parallel
    - Both the web app and UI package can run their dev servers simultaneously
    - No caching (as configured)
 
 2. **Building:**
-   \`\`\`bash
+   ```bash
    npm run build
-   \`\`\`
-   - Turborepo builds dependencies first (\`packages/ui\`)
+   ```
+   - Turborepo builds dependencies first (`packages/ui`)
    - Then builds the web app
    - Caches outputs for faster subsequent builds
    - Only rebuilds what changed
 
 3. **Linting:**
-   \`\`\`bash
+   ```bash
    npm run lint
-   \`\`\`
+   ```
    - Runs linting in all packages
    - Respects dependency order
    - Can run in parallel for independent packages
 
 ### Benefits in This Project
 
-1. **Shared Components**: The \`@repo/ui\` package can be developed and tested independently
+1. **Shared Components**: The `@repo/ui` package can be developed and tested independently
 2. **Fast Iteration**: Changes to the UI package are immediately available to the web app
 3. **Consistent Builds**: All packages use the same build system
 4. **Easy Scaling**: Adding new apps or packages is straightforward
@@ -340,17 +340,17 @@ To enable remote caching (share cache with your team):
 
 1. Create a Vercel account (or use another provider)
 2. Link your repository:
-   \`\`\`bash
+   ```bash
    npx turbo login
    npx turbo link
-   \`\`\`
+   ```
 3. Cache will automatically be shared
 
 ### Custom Task Pipelines
 
 You can create more complex pipelines:
 
-\`\`\`json
+```json
 {
   "tasks": {
     "test": {
@@ -363,13 +363,13 @@ You can create more complex pipelines:
     }
   }
 }
-\`\`\`
+```
 
 ### Environment Variables
 
 Turborepo can track environment variables:
 
-\`\`\`json
+```json
 {
   "tasks": {
     "build": {
@@ -377,32 +377,32 @@ Turborepo can track environment variables:
     }
   }
 }
-\`\`\`
+```
 
 ## Troubleshooting
 
 ### Cache Not Working
 
-- Check that \`outputs\` are correctly specified in \`turbo.json\`
+- Check that `outputs` are correctly specified in `turbo.json`
 - Verify file paths match your actual build outputs
-- Clear cache: \`npx turbo clean\`
+- Clear cache: `npx turbo clean`
 
 ### Tasks Running in Wrong Order
 
-- Check \`dependsOn\` configuration
-- Use \`^\` prefix for dependency tasks
-- Use task names without \`^\` for same-package dependencies
+- Check `dependsOn` configuration
+- Use `^` prefix for dependency tasks
+- Use task names without `^` for same-package dependencies
 
 ### TypeScript Path Resolution Issues
 
-- Ensure \`tsconfig.json\` paths are correctly configured
+- Ensure `tsconfig.json` paths are correctly configured
 - Restart your TypeScript server/IDE
-- Check that package names match in \`package.json\` and imports
+- Check that package names match in `package.json` and imports
 
 ## Resources
 
 - [Turborepo Documentation](https://turbo.build/repo/docs)
 - [Turborepo GitHub](https://github.com/vercel/turbo)
 - [Monorepo Guide](https://turbo.build/repo/docs/handbook)
-`;
+
 

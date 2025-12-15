@@ -1,13 +1,8 @@
 import { Template, Category } from '@/types/types';
 import { JS_OUTPUT_CHALLENGES_SNIPPETS } from '@/data/snippets/js-output-challenges';
 import { DEBOUNCE_STARTER_CODE } from '@/data/starter-code/debounce';
-import { NESTED_COMMENTS_MD } from '@/data/markdown/nested-comments';
 import commentsImage from '@/data/assets/comments.png';
-import { SMART_JS_MD } from '@/data/markdown/smartjs';
-import { DEBOUNCE_EDITORIAL } from '@/data/editorial/debounce-editorial';
 import { PROMISE_OUTPUT_CHALLENGES_SNIPPETS } from '@/data/snippets/promise-output-challenges';
-import { TURBOREPO_MD } from '@/data/markdown/turborepo';
-import { JAVASCRIPT_FUNDAMENTALS_MD } from '@/data/markdown/javascript-fundamentals';
 
 export const INITIAL_TEMPLATES: Template[] = [
   {
@@ -36,7 +31,7 @@ export const INITIAL_TEMPLATES: Template[] = [
     
 The key insight with debouncing is that we reset the timer every time the function is called. Only when the user stops calling the function for the specified delay does the actual execution happen. This is perfect for events that fire rapidly but where you only care about the final state.
 `,
-    editorial: DEBOUNCE_EDITORIAL,
+    editorial: '',
     imageUrl: 'https://placehold.co/800x600/3b82f6/ffffff/png?text=Debounce+It!',
     demoUrl: '#',
     githubUrl: 'https://github.com/pratikkumar399/frontendfordummies/tree/main/src/data/starter-code/debounce-throttle',
@@ -54,7 +49,7 @@ The key insight with debouncing is that we reset the timer every time the functi
     name: "Get smart in javascript",
     slug: 'get-smart-in-javascript',
     shortDescription: 'A collection of JavaScript tricks to test your understanding of the language. This will help you to get smart in javascript.',
-    fullDescription: SMART_JS_MD,
+    fullDescription: '',
     imageUrl: 'https://placehold.co/800x600/3b82f6/ffffff/png?text=Get+Smart+in+JavaScript',
     demoUrl: '#',
     githubUrl: '#',
@@ -70,7 +65,7 @@ The key insight with debouncing is that we reset the timer every time the functi
     name: 'Nested Comments System',
     slug: 'nested-comments-system',
     shortDescription: 'Recursive component to display threaded comments like Reddit.',
-    fullDescription: NESTED_COMMENTS_MD,
+    fullDescription: '',
     imageUrl: commentsImage.src,
     demoUrl: '/design/nested-comments-system/demo',
     githubUrl: 'https://github.com/pratikkumar399/frontendfordummies/tree/main/src/components/demos/NestedCommentsSystem',
@@ -103,7 +98,7 @@ The key insight with debouncing is that we reset the timer every time the functi
     name: 'Turborepo: Complete Guide to Monorepo Build System',
     slug: 'turborepo-complete-guide',
     shortDescription: 'Learn how to set up and migrate to Turborepo for faster builds, intelligent caching, and better monorepo management.',
-    fullDescription: TURBOREPO_MD,
+    fullDescription: '',
     imageUrl: 'https://placehold.co/800x600/6366f1/ffffff/png?text=Turborepo+Guide',
     demoUrl: '#',
     githubUrl: 'https://github.com/vercel/turbo',
@@ -119,7 +114,7 @@ The key insight with debouncing is that we reset the timer every time the functi
     name: 'JavaScript Basics and Language Fundamentals',
     slug: 'javascript-fundamentals',
     shortDescription: 'Deep dive into how JavaScript really works: types, memory, hoisting, coercion, and references.',
-    fullDescription: JAVASCRIPT_FUNDAMENTALS_MD,
+    fullDescription: '',
     imageUrl: 'https://placehold.co/800x600/f97316/ffffff/png?text=JS+Fundamentals',
     demoUrl: '#',
     githubUrl: '#',
