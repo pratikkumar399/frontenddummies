@@ -1,0 +1,122 @@
+# SEO Guide for Frontend Developers
+
+SEO is as much a frontend discipline as it is about keywords. Your markup, loading strategy, and performance choices decide whether crawlers can discover, index, and rank your pages.
+
+## Crawling vs Indexing
+
+- **Crawling**: bots discover pages via links and sitemaps. This is how search engines (like Googlebot) discover your website pages. They follow links and sitemaps to find new content.
+- **Indexing**: After crawling, Google decides which pages to store in its index. If a page isn’t indexed, it won’t appear in search results.
+- **Frontend checklist**:
+  - Link pages with `<a>` tags; avoid hiding key content behind heavy JS.
+  - Keep a fresh `sitemap.xml`; expose new routes.
+  - Guard sensitive/admin routes with `robots.txt`, not public pages.
+
+### Robots and Sitemap
+
+```txt
+# robots.txt
+User-agent: *
+Disallow: /admin
+
+Sitemap: https://frontenddummies.com/sitemap.xml
+```
+
+## Meta Tags
+
+- **Title**: unique per page, 50–60 chars, include the primary keyword.
+- **Description**: compelling summary to improve CTR.
+- **Viewport**: Required for responsive design, critical for mobile-first indexing.
+- **Open Graph / Twitter**: better social previews.
+
+```html
+<head>
+  <title>SEO Essentials for Frontend Developers</title>
+  <meta name="description" content="Crawling, indexing, Core Web Vitals, and loading strategies that help your pages rank and stay fast." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta property="og:title" content="SEO Essentials for Frontend Developers" />
+  <meta property="og:description" content="Frontend-first SEO: crawling, indexing, meta tags, CWV, lazy vs eager loading." />
+  <meta property="og:type" content="article" />
+  <meta name="twitter:card" content="summary_large_image" />
+</head>
+```
+
+## Heading Structure
+
+- One clear `<h1>` for the main topic; use `<h2>`–`<h4>` for subtopics.
+- Avoid skipping levels; keep the hierarchy logical.
+- Benefits both accessibility and search understanding.
+
+## Alt Text for Images
+
+-   Describes images to crawlers and screen readers.
+- Helps with image search ranking.
+- Should be descriptive and concise.
+
+```html
+<img src="/hero.png" alt="Dashboard showing Core Web Vitals scores" loading="lazy" />
+```
+
+## Canonicalization
+
+- Prevent duplicate content issues when pages are reachable via multiple URLs or query params.
+- Use canonicals on every canonical page:
+
+```html
+<link rel="canonical" href="https://frontenddummies.com/blog/seo-essentials-for-frontend" />
+```
+
+## Core Web Vitals Cheat Sheet
+
+### Largest Contentful Paint (LCP) – target ≤ 2.5s
+- Optimize and compress hero images; prefer next-gen formats.
+- Inline critical CSS; defer non-critical JS/CSS.
+- Use SSR/SSG to render above-the-fold content quickly.
+
+### Cumulative Layout Shift (CLS) – target ≤ 0.1
+- Always set width/height or aspect ratio for media and iframes.
+- Reserve space for ads/widgets; avoid inserting content above existing UI.
+- Use font-display strategies or preloading to reduce shift.
+
+### First Input Delay / Interaction to Next Paint (FID/INP) – target ≤ 100ms
+- Break up long tasks; defer heavy work off the main thread.
+- Tree-shake dependencies and trim third-party scripts.
+- Use web workers for expensive computation.
+
+## Lazy Loading vs Eager Loading
+
+- **Eager**: critical, above-the-fold assets (hero image, primary font). Use `<link rel="preload">` to fetch early.
+- **Lazy**: below-the-fold assets to cut initial bytes and improve FID/INP.
+
+```html
+<!-- Eager -->
+<link rel="preload" href="/hero.jpg" as="image">
+<link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+
+<!-- Native lazy -->
+<img src="/gallery-1.jpg" loading="lazy" alt="Feature highlights" />
+<iframe src="https://www.youtube.com/embed/abc123" loading="lazy"></iframe>
+```
+
+**Intersection Observer** gives more control for progressive loading:
+
+```js
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.src = entry.target.dataset.src;
+      observer.unobserve(entry.target);
+    }
+  });
+});
+
+document.querySelectorAll('[data-src]').forEach(el => observer.observe(el));
+```
+
+## Frontend SEO Checklist
+
+- Semantic headings, descriptive alt text, and canonical URLs.
+- Proper meta title/description plus Open Graph/Twitter tags.
+- Robots allow public pages; sitemap includes new routes.
+- Above-the-fold content eagerly loaded; rest lazy; dimensions set to avoid CLS.
+- Monitor CWV; optimize images, split bundles, and keep main thread light.
+

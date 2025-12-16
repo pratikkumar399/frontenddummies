@@ -124,5 +124,21 @@ The key insight with debouncing is that we reset the timer every time the functi
     author: 'modernDev',
     createdAt: '2025-12-16',
     goal: 'Build a rock-solid mental model of JavaScript core language fundamentals so the language stops surprising you.'
+  },
+  {
+    id: '8',
+    name: 'SEO guide for Frontend Developers',
+    slug: 'seo-guide-for-frontend',
+    shortDescription: 'A practical guide to crawling, indexing, meta tags, semantics, and Core Web Vitals so your pages rank and stay fast.',
+    fullDescription: 'Learn how frontend choices influence SEO: make pages discoverable, indexable, and fast. Covers crawling, meta data, heading structure, alt text, canonical URLs, Core Web Vitals, and smart loading strategies with clear frontend examples.',
+    imageUrl: 'https://placehold.co/800x600/0ea5e9/ffffff/png?text=SEO+Essentials',
+    demoUrl: '#',
+    githubUrl: '#',
+    tags: ['SEO', 'Core Web Vitals', 'Crawling', 'Performance'],
+    category: Category.BLOGS,
+    techStack: ['SEO', 'Web Performance', 'Frontend'],
+    author: 'modernDev',
+    createdAt: '2025-12-16',
+    goal: 'Use this checklist to ship SEO-friendly pages with strong Core Web Vitals.'
   }
 ];

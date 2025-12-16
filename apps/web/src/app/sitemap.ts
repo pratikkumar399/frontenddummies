@@ -3,6 +3,7 @@ export const dynamic = 'force-static';
 
 import { MetadataRoute } from 'next';
 import { INITIAL_TEMPLATES } from '@/lib/constants';
+import { Category } from '@/types/types';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://frontenddummies.com';
@@ -31,6 +32,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
+  // Blog detail pages
+  const blogPages = INITIAL_TEMPLATES
+    .filter((template) => template.category === Category.BLOGS)
+    .map((template) => ({
+      url: `${baseUrl}/blog/${template.slug}`,
+      lastModified: new Date(template.createdAt),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    }));
+
   // Dynamic practice pages (only for templates with starter code)
   const practicePages = INITIAL_TEMPLATES
     .filter((template) => template.starterCode)
@@ -54,6 +65,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...staticPages,
     ...designPages,
+    ...blogPages,
     ...practicePages,
     ...snippetPages,
   ];
