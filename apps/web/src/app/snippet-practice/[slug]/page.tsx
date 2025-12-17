@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/immutability */
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';    
 import { useApp } from '@/context/AppContext';
@@ -23,6 +23,65 @@ export default function SnippetPracticePage() {
 
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [output, setOutput] = useState<Record<string, string>>({});
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [hasCompletedQuiz, setHasCompletedQuiz] = useState(false);
+
+  const totalQuestions = template?.snippets?.length ?? 0;
+  const attemptedCount = Object.keys(answers).length;
+
+  const computeScore = () => {
+    if (!template?.snippets) {
+      return {
+        correct: 0,
+        total: 0,
+        percent: 0,
+        bandTitle: '',
+        bandMessage: '',
+      };
+    }
+
+    const total = template.snippets.length;
+    const correct = template.snippets.reduce((acc, snippet) => {
+      return acc + (answers[snippet.id] === snippet.correctAnswer ? 1 : 0);
+    }, 0);
+
+    const percent = total ? Math.round((correct / total) * 100) : 0;
+
+    let bandTitle = '';
+    let bandMessage = '';
+
+    if (percent === 100) {
+      bandTitle = 'Perfect score! 🧠';
+      bandMessage =
+        'You nailed every single question. Your understanding of these JavaScript patterns is rock solid.';
+    } else if (percent >= 80) {
+      bandTitle = 'Great job! 🚀';
+      bandMessage =
+        'You have a strong grasp of the concepts. Revisit the missed questions to make your understanding bulletproof.';
+    } else if (percent >= 50) {
+      bandTitle = 'Good progress 💡';
+      bandMessage =
+        'You’re getting there. Spend a bit more time with the explanations and try the tricky ones again.';
+    } else {
+      bandTitle = 'Nice start 👶';
+      bandMessage =
+        'Everyone starts somewhere. Use the explanations as a mini-lesson and re-attempt the questions after a short break.';
+    }
+
+    return { correct, total, percent, bandTitle, bandMessage };
+  };
+
+  useEffect(() => {
+    if (!template?.snippets?.length) return;
+
+    const total = template.snippets.length;
+    const attempted = Object.keys(answers).length;
+
+    if (total > 0 && attempted === total && !hasCompletedQuiz) {
+      setHasCompletedQuiz(true);
+      setShowResultModal(true);
+    }
+  }, [answers, template, hasCompletedQuiz]);
 
   if (!templates.length) {
     return (
@@ -139,25 +198,44 @@ export default function SnippetPracticePage() {
       <div className="min-h-screen bg-dark-bg pt-16">
       
       {/* Header */}
-      <nav className="sticky w-[80%] mx-auto top-0 z-40 h-16 flex justify-center items-center px-4 sm:px-6 lg:px-8">
-        <Button 
-          onClick={() => {
-            if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
-              router.back();
-            } else {
-              router.push(`/design/${slug}`);
-            }
-          }} 
-          variant={ButtonVariant.GHOST}
-          size={ButtonSize.SM}
-          className="flex items-center gap-2 text-[#9ca3af] hover:text-white"
-          icon={<ChevronLeft size={20} />}
-        >
-          <span className="font-medium">Back</span>
-        </Button>
-        <div className="h-6 w-[1px] bg-[#444] mx-4"></div>
-        <h1 className="text-lg font-bold truncate text-white">{template.name}</h1>
+      <nav className="sticky w-[80%] mx-auto top-0 z-30 h-16 flex items-center px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-dark-bg/95 to-dark-bg/80 backdrop-blur-lg border-b border-dark-border/60">
+        <div className="flex items-center gap-4 min-w-0">
+          <Button 
+            onClick={() => {
+              if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+                router.back();
+              } else {
+                router.push(`/design/${slug}`);
+              }
+            }} 
+            variant={ButtonVariant.GHOST}
+            size={ButtonSize.SM}
+            className="flex items-center gap-2 text-[#9ca3af] hover:text-white"
+            icon={<ChevronLeft size={20} />}
+          >
+            <span className="font-medium text-xs sm:text-sm">Back</span>
+          </Button>
+          <div className="h-6 w-[1px] bg-[#444]"></div>
+          <h1 className="text-sm sm:text-base md:text-lg font-bold truncate text-white">
+            {template.name}
+          </h1>
+        </div>
       </nav>
+
+      {/* Fixed Circular Question Counter - bottom right */}
+      <div className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-40">
+        <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#020617]/95 border border-primary-500/50 shadow-[0_0_25px_rgba(34,197,94,0.35)]">
+          <div className="absolute -inset-px rounded-full bg-gradient-to-tr from-primary-500/40 via-emerald-400/25 to-teal-500/40 opacity-40 blur-md pointer-events-none" />
+          <div className="relative flex flex-col items-center justify-center leading-tight">
+            <span className="text-[11px] sm:text-xs font-semibold text-primary-50 tabular-nums">
+              {attemptedCount}
+            </span>
+            <span className="text-[9px] sm:text-[10px] text-zinc-500 tabular-nums">
+              / {totalQuestions}
+            </span>
+          </div>
+        </div>
+      </div>
 
       {/* Content */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
@@ -235,10 +313,10 @@ export default function SnippetPracticePage() {
                                             disabled={isAnswered}
                                             variant={ButtonVariant.OUTLINE}
                                             size={ButtonSize.MD}
-                                            className={`relative w-full px-4 py-3 rounded-lg text-left text-sm font-medium border transition-all duration-200 ${stateClass}`}
+                                            className={`relative w-full px-4 py-3 rounded-lg text-left text-sm font-medium border transition-all duration-200 items-start whitespace-normal h-auto min-h-10 ${stateClass}`}
                                         >
                                             <div className="flex items-start justify-between w-full gap-3">
-                                                <span className="break-words leading-relaxed text-sm">
+                                                <span className="break-words whitespace-normal leading-snug text-sm">
                                                     {option}
                                                 </span>
                                                 {isAnswered && optIdx === snippet.correctAnswer && (
@@ -283,6 +361,54 @@ export default function SnippetPracticePage() {
         </div>
 
       </div>
+
+      {showResultModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#18181b] border border-[#27272a] rounded-2xl max-w-md w-full mx-4 p-6 shadow-2xl">
+            {(() => {
+              const { correct, total, percent, bandTitle, bandMessage } = computeScore();
+              return (
+                <>
+                  <h2 className="text-xl font-bold text-white mb-2">Your Score</h2>
+                  <p className="text-sm text-zinc-400 mb-4">{bandTitle}</p>
+
+                  <div className="flex items-baseline gap-3 mb-4">
+                    <span className="text-4xl font-extrabold text-primary-400">
+                      {percent}
+                      <span className="text-2xl align-top ml-1">%</span>
+                    </span>
+                    <span className="text-sm text-zinc-400">
+                      {correct} of {total} questions correct
+                    </span>
+                  </div>
+
+                  <p className="text-sm text-zinc-300 leading-relaxed mb-6">
+                    {bandMessage}
+                  </p>
+
+                  <div className="flex justify-end gap-3">
+                    <Button
+                      variant={ButtonVariant.SECONDARY}
+                      size={ButtonSize.SM}
+                      onClick={() => {
+                        setShowResultModal(false);
+                        setAnswers({});
+                        setOutput({});
+                        setHasCompletedQuiz(false);
+                        if (typeof window !== 'undefined') {
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                      }}
+                    >
+                      Close & Reset
+                    </Button>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      )}
     </div>
     </>
   );

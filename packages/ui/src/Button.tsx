@@ -102,7 +102,7 @@ export const LinkButton: React.FC<LinkButtonProps> = ({
   }
 
   return (
-    <Link href={href} className={buttonClasses} style={style}>
+    <Link href={href} target={target || '_self'} className={buttonClasses} style={style}>
       {content}
     </Link>
   );

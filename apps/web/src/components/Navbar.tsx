@@ -33,6 +33,7 @@ export default function Navbar() {
             </LinkButton>
             <LinkButton 
               href="/playground" 
+              target='_blank'
               variant={ButtonVariant.SECONDARY}
               size={ButtonSize.SM}
               icon={<Terminal size={16} />}
