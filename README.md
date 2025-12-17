@@ -84,11 +84,12 @@ frontendfordummies/
 │           │   ├── Navbar.tsx, Footer.tsx
 │           │   ├── design-detail/         // detail page building blocks
 │           │   └── demos/                 // demo UI components
+│           ├── content/
+│           │   ├── articles/*.mdx        // blog posts and challenge descriptions (MDX)
+│           │   └── editorials/*.mdx      // solution writeups (MDX)
 │           ├── data/
 │           │   ├── snippets/*.ts         // quiz snippets
-│           │   ├── markdown/*.ts          // long-form descriptions/editorials
-│           │   ├── starter-code/*.ts      // IDE starter templates
-│           │   └── editorial/*.ts       // solution writeups
+│           │   └── starter-code/*.ts      // IDE starter templates
 │           ├── lib/
 │           │   ├── constants.ts           // INITIAL_TEMPLATES seed data
 │           │   ├── challenges.ts          // lookup helpers
@@ -125,10 +126,10 @@ Challenges and blogs are seeded in `apps/web/src/lib/constants.ts` as `Template`
 - **Blogs** – Educational content and guides (only visible in navbar)
 
 Supporting content lives in:
+- `apps/web/src/content/articles/` – Blog posts and challenge descriptions (MDX files)
+- `apps/web/src/content/editorials/` – Solution writeups (MDX files)
 - `apps/web/src/data/snippets/` – Quiz snippets
-- `apps/web/src/data/markdown/` – Long-form descriptions/editorials/blogs
 - `apps/web/src/data/starter-code/` – IDE starter templates
-- `apps/web/src/data/editorial/` – Solution writeups
 
 ## Getting Started
 
@@ -181,20 +182,19 @@ npm run clean
 2. Set the `category` to one of: `Category.REACT`, `Category.JAVASCRIPT`, `Category.SNIPPET_PRACTICE`, etc.
 3. If needed, place supporting content in:
    - **Snippets**: `apps/web/src/data/snippets/*.ts`
-   - **Markdown/Editorial**: `apps/web/src/data/markdown/*.ts` or `apps/web/src/data/editorial/*.ts`
+   - **Article/Description**: Create an MDX file at `apps/web/src/content/articles/{slug}.mdx` (will be auto-loaded)
+   - **Editorial**: Create an MDX file at `apps/web/src/content/editorials/{slug}.mdx` (will be auto-loaded)
    - **Starter Code**: `apps/web/src/data/starter-code/*.ts`
 4. Include `demoUrl` or add a demo route under `apps/web/src/app/design/[slug]/demo` if you provide one
 
 ### Adding a Blog Post
 
-1. Create a markdown TypeScript file in `apps/web/src/data/markdown/` (e.g., `my-blog.ts`)
-2. Export a constant with the markdown content: `export const MY_BLOG_MD = \`...\`;`
-3. Import it in `apps/web/src/lib/constants.ts`
-4. Add a new template entry with:
+1. Create an MDX file at `apps/web/src/content/articles/{slug}.mdx` with your blog content
+2. Add a new template entry in `apps/web/src/lib/constants.ts` with:
    - `category: Category.BLOGS`
-   - `fullDescription: MY_BLOG_MD`
-   - Unique `slug` for the blog post
-5. The blog will automatically appear on `/blog` and be accessible at `/blog/[slug]`
+   - Unique `slug` matching the MDX filename (without extension)
+   - The content will be automatically loaded from the MDX file
+3. The blog will automatically appear on `/blog` and be accessible at `/blog/[slug]`
 
 ## Features
 
