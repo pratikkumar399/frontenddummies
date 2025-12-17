@@ -1,4 +1,4 @@
-const CACHE_NAME = 'frontend-dummies-v2';
+const CACHE_NAME = 'frontend-dummies-v3';
 const urlsToCache = [
     '/',
     '/manifest.json',
