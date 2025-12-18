@@ -63,14 +63,16 @@ export default function BlogPage() {
 
           {/* Search */}
           <div className="mb-8">
-            <div className="relative group max-w-md">
+            <div className="relative group max-w-md ">
               <div className="absolute -inset-0.5 bg-primary-600 rounded-lg blur opacity-10 group-hover:opacity-30 transition duration-500"></div>
               <div className="relative flex items-center bg-dark-input rounded-lg border border-dark-border">
                 <div className="pl-3 text-zinc-500">
                   <Search size={18} />
                 </div>
                 <input
+                  id='search'
                   type="text"
+                  name='search'
                   placeholder="Search blogs..."
                   className="block w-full px-3 py-2.5 bg-transparent text-white placeholder-zinc-600 focus:outline-none text-sm"
                   value={searchQuery}

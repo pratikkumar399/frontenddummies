@@ -234,22 +234,15 @@
     cursor: not-allowed;
   }
   
-  /* Global focus styles - replace white outlines with green */
+  /* Global focus styles */
   *:focus {
     outline: none;
   }
   
-  *:focus-visible {
-    outline: 2px solid var(--primary-500);
-    outline-offset: 2px;
-    border-radius: 0.25rem;
-  }
-  
+
   button:focus-visible,
   a:focus-visible,
-  input:focus-visible,
-  textarea:focus-visible,
-  select:focus-visible {
+  [role="button"]:focus-visible {
     outline: 2px solid var(--primary-500);
     outline-offset: 2px;
     box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
