@@ -43,7 +43,7 @@ export const ChallengeDescription: React.FC<ChallengeDescriptionProps> = ({ temp
           {template.fullDescription}
         </ReactMarkdown>
       </div>
-      <div className="mt-8 p-4 bg-primary-900/10 border border-primary-600/20 rounded-lg">
+      <div className="mt-8 p-4 bg-primary-900/10 border border-primary-600/20 rounded-[12px]">
         <p className="text-primary-300 m-0 text-sm">
           <strong>Goal:</strong> {template.goal || DEFAULT_GOAL}
         </p>

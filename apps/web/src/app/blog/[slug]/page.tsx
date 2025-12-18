@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { Category } from '@/types/types';
 import styles from './page.module.css';
+import { GiscusComments } from '@/components/GiscusComments';
 
 // Define params as a Promise for Next.js 15 compatibility
 type PageProps = {
@@ -145,6 +146,9 @@ export default async function BlogDetailPage({ params }: PageProps) {
                 <ChallengeDescriptionServer template={template} />
               </div>
             </div>
+
+            {/* Comments */}
+            <GiscusComments />
           </div>
         </div>
       </div>
