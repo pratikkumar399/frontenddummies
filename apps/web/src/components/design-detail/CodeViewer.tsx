@@ -2,13 +2,13 @@
 
 import React, { useState, useRef } from 'react';
 import Editor from '@monaco-editor/react';
-import { 
-  FileCode, 
-  FileJson, 
-  FileType, 
-  File, 
-  ChevronRight, 
-  ChevronDown, 
+import {
+  FileCode,
+  FileJson,
+  FileType,
+  File,
+  ChevronRight,
+  ChevronDown,
   ArrowLeft,
   Folder,
   FolderOpen,
@@ -36,15 +36,15 @@ const getFileIcon = (fileName: string) => {
   return <File size={16} className="text-muted-foreground" />;
 };
 
-const FileTreeItem = ({ 
-  node, 
-  depth = 0, 
-  activeFile, 
-  onFileClick 
-}: { 
-  node: FileNode; 
-  depth?: number; 
-  activeFile: FileNode | null; 
+const FileTreeItem = ({
+  node,
+  depth = 0,
+  activeFile,
+  onFileClick
+}: {
+  node: FileNode;
+  depth?: number;
+  activeFile: FileNode | null;
   onFileClick: (file: FileNode) => void;
 }) => {
   const [isOpen, setIsOpen] = useState(true);
@@ -135,7 +135,7 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
       {/* Top Bar */}
       <header className="flex items-center justify-between px-4 py-2 bg-card border-b border-border h-12 shrink-0">
         <div className="flex items-center gap-4">
-          <Button 
+          <Button
             variant={ButtonVariant.GHOST}
             size={ButtonSize.SM}
             className="md:hidden p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground"
@@ -144,8 +144,8 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
           >
             <span className="sr-only">Menu</span>
           </Button>
-           <Link 
-            href={`/design/${slug}/demo`} 
+          <Link
+            href={`/design/${slug}/demo`}
             className="p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             title="Back to Demo"
           >
@@ -160,7 +160,7 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
       <div className="flex flex-1 overflow-hidden relative">
         {/* Mobile Overlay Backdrop */}
         {isSidebarOpen && (
-          <div 
+          <div
             className="fixed inset-0 bg-black/50 z-40 md:hidden cursor-pointer"
             onClick={() => setIsSidebarOpen(false)}
             role="button"
@@ -168,20 +168,20 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
         )}
 
         {/* Sidebar - File Explorer */}
-        <aside 
+        <aside
           ref={sidebarRef}
           className={cn(
             "bg-card border-r border-border flex flex-col shrink-0 select-none",
             "fixed inset-y-0 left-0 z-50 h-full transition-transform duration-300 shadow-2xl md:shadow-none",
             isSidebarOpen ? "translate-x-0" : "-translate-x-full",
             "md:relative md:translate-x-0 md:transition-none md:z-0",
-            "!w-[85vw] sm:!w-64 " // Override inline width style on mobile
+            "!w-[85vw] sm:!w-64 "
           )}
           style={{ width: 360 }}
         >
           <div className="px-4 py-2 text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
             <span>Explorer</span>
-            <Button 
+            <Button
               variant={ButtonVariant.GHOST}
               size={ButtonSize.SM}
               className="md:hidden p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground"
@@ -192,20 +192,20 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
             </Button>
           </div>
           <div className="flex-1 overflow-y-auto py-2">
-             <div className="mb-2 px-2 text-xs font-bold text-primary-400 uppercase tracking-wider">
-                {title.length > 20 ? title.substring(0, 20) + '...' : title}
-             </div>
-             {files.map((node) => (
-               <FileTreeItem
-                 key={node.path}
-                 node={node}
-                 activeFile={activeFile}
-                 onFileClick={(file) => {
-                   setActiveFile(file);
-                   setIsSidebarOpen(false); // Close sidebar on file selection on mobile
-                 }}
-               />
-             ))}
+            <div className="mb-2 px-2 text-xs font-bold text-primary-400 uppercase tracking-wider">
+              {title.length > 20 ? title.substring(0, 20) + '...' : title}
+            </div>
+            {files.map((node) => (
+              <FileTreeItem
+                key={node.path}
+                node={node}
+                activeFile={activeFile}
+                onFileClick={(file) => {
+                  setActiveFile(file);
+                  setIsSidebarOpen(false); // Close sidebar on file selection on mobile
+                }}
+              />
+            ))}
           </div>
         </aside>
 
@@ -225,8 +225,8 @@ export function CodeViewer({ files, title, slug }: CodeViewerProps) {
                   size={ButtonSize.SM}
                   className={cn(
                     "flex items-center gap-2 px-3 py-1 mr-2 rounded text-xs font-medium transition-all duration-200",
-                    copied 
-                      ? "bg-primary-500/10 text-primary-400 border border-primary-500/20" 
+                    copied
+                      ? "bg-primary-500/10 text-primary-400 border border-primary-500/20"
                       : "bg-accent hover:bg-card text-muted-foreground border border-transparent"
                   )}
                   title="Copy Code"

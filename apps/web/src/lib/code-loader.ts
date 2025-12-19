@@ -4,7 +4,7 @@ import path from 'path';
 const DEMO_PATHS: Record<string, string> = {
   'nested-comments-system': 'src/components/demos/NestedCommentsSystem',
   'infinite-scroll-component': 'src/components/demos/InfiniteScrollDemo.tsx',
-  'modal-component': 'src/components/demos/ModalComponent',
+  'modal-component': 'src/components/demos/ModalDemo',
 };
 
 export interface FileNode {

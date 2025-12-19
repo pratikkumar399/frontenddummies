@@ -9,7 +9,7 @@ import { Category } from '@/types/types';
 import styles from './page.module.css';
 import { GiscusComments } from '@/components/GiscusComments';
 
-// Define params as a Promise for Next.js 15 compatibility
+
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
@@ -133,7 +133,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
             <div className="rounded-2xl overflow-hidden ">
               <div className="aspect-video relative group">
                 <Image
-                  src={template.imageUrl} 
+                  src={template.imageUrl}
                   alt={template.name}
                   width={1000}
                   height={1000}
@@ -141,7 +141,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
                   priority
                 />
               </div>
-              
+
               <div className="pt-6 ">
                 <ChallengeDescriptionServer template={template} />
               </div>

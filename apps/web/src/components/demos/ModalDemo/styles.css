@@ -1,0 +1,25 @@
+.open-modal-button{
+    background-color: blue;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 auto;
+    display: block;
+}
+
+.children-container{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.close-modal-button{
+    align-self: flex-end;
+    width: 200px;
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
