@@ -308,13 +308,14 @@ function PracticeClientInner({ slug, editorial }: PracticeClientProps) {
     }
   };
 
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#1a1a1a] text-[#eff1f6] font-sans">
       <nav className="h-12 bg-[#262626] border-b border-[#333] flex items-center justify-between px-4 shrink-0 select-none">
         <div className="flex items-center gap-4">
           <Button
             onClick={() => {
-              if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+              if (window.history.length > 1) {
                 router.back();
               } else {
                 router.push(`/design/${slug}`);
@@ -370,7 +371,7 @@ function PracticeClientInner({ slug, editorial }: PracticeClientProps) {
             {isRunning ? <span className="animate-pulse">Running...</span> : 'Run'}
           </Button>
         </div>
-      </nav>
+      </nav >
 
       <div
         ref={containerRef}
@@ -387,8 +388,8 @@ function PracticeClientInner({ slug, editorial }: PracticeClientProps) {
               variant={ButtonVariant.GHOST}
               size={ButtonSize.SM}
               className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-t-md transition-colors ${activeTab === PracticeTab.DESCRIPTION
-                  ? 'bg-[#262626] text-white border-t border-x border-[#3e3e3e] relative -bottom-[1px]'
-                  : 'text-[#9ca3af] hover:text-white'
+                ? 'bg-[#262626] text-white border-t border-x border-[#3e3e3e] relative -bottom-[1px]'
+                : 'text-[#9ca3af] hover:text-white'
                 }`}
               icon={<FileText size={13} className="text-blue-500" />}
             >
@@ -399,8 +400,8 @@ function PracticeClientInner({ slug, editorial }: PracticeClientProps) {
               variant={ButtonVariant.GHOST}
               size={ButtonSize.SM}
               className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-t-md transition-colors ${activeTab === PracticeTab.EDITORIAL
-                  ? 'bg-[#262626] text-white border-t border-x border-[#3e3e3e] relative -bottom-[1px]'
-                  : 'text-[#9ca3af] hover:text-white'
+                ? 'bg-[#262626] text-white border-t border-x border-[#3e3e3e] relative -bottom-[1px]'
+                : 'text-[#9ca3af] hover:text-white'
                 }`}
               icon={<Code2 size={13} className="text-orange-500" />}
             >
@@ -645,7 +646,7 @@ function PracticeClientInner({ slug, editorial }: PracticeClientProps) {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 
