@@ -179,12 +179,12 @@ The key insight with debouncing is that we reset the timer every time the functi
   },
   {
     id: '11',
-    name: 'Promise Retry',
-    slug: 'retry-promise',
+    name: 'Fetch And Retry',
+    slug: 'fetch-retry',
     shortDescription: 'Implement a retry function that handles transient failures by retrying async operations with optional delays.',
     fullDescription: `Retry logic is essential for building resilient applications. Network requests, database connections, and API calls can fail temporarily due to server overload, rate limiting, or network issues.
 
-In this challenge, you'll implement a retry function that automatically retries a failing async operation a specified number of times. You'll work with a mock API that fails N times before succeeding, simulating real-world transient failures.
+In this challenge, you'll implement a retry function that automatically retries a failing async operation a specified number of times. Design and implement a function that fetches data from an API and retries the request when it fails.
 
 Key concepts you'll practice:
 - Promise chaining and error handling
