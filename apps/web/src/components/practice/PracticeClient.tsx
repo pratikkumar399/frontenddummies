@@ -198,18 +198,42 @@ function PracticeClientInner({ slug, editorial }: PracticeClientProps) {
     setIsRunning(true);
     setLogs([]);
 
+    const formatValue = (val: unknown): string => {
+      if (val === undefined) return 'undefined';
+      if (val === null) return 'null';
+      if (val instanceof Promise) return 'Promise { <pending> }';
+      if (typeof val === 'object') {
+        try {
+          return JSON.stringify(val, null, 2);
+        } catch (e) {
+          return String(val); // Fallback for circular refs etc
+        }
+      }
+      return String(val);
+    };
+
     const proxyLog = (type: LogType, args: unknown[]) => {
       const content = args.map(arg => {
-        if (arg === undefined) return 'undefined';
-        if (arg === null) return 'null';
-        if (typeof arg === 'object') {
-          try {
-            return JSON.stringify(arg, null, 2);
-          } catch (e) {
-            return String(arg); // Fallback for circular refs etc
-          }
+        // Handle Promises: show pending state and log result when settled
+        if (arg instanceof Promise) {
+          arg
+            .then((resolved) => {
+              setLogs(prev => [...prev, {
+                type: LogType.INFO,
+                content: `Promise resolved → ${formatValue(resolved)}`,
+                timestamp: new Date().toLocaleTimeString()
+              }]);
+            })
+            .catch((rejected) => {
+              setLogs(prev => [...prev, {
+                type: LogType.ERROR,
+                content: `Promise rejected → ${formatValue(rejected)}`,
+                timestamp: new Date().toLocaleTimeString()
+              }]);
+            });
+          return 'Promise { <pending> }';
         }
-        return String(arg);
+        return formatValue(arg);
       }).join(' ');
 
       const newEntry: LogEntry = {

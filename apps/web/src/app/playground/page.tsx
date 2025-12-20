@@ -7,12 +7,12 @@ import type { editor } from 'monaco-editor';
 import { LogType, LogEntry, ButtonVariant, ButtonSize } from '@/types/types';
 import { Button, LinkButton, ConfirmDialog } from '@repo/ui';
 import Link from 'next/link';
-import { 
-  Play, 
-  RotateCcw, 
+import {
+  Play,
+  RotateCcw,
   RotateCw,
-  Terminal, 
-  CheckCircle2, 
+  Terminal,
+  CheckCircle2,
   AlertCircle,
   Trash2,
   Code2,
@@ -33,20 +33,20 @@ console.warn('This is a warning message');
 
 export default function PlaygroundPage() {
   const { isDarkMode } = useApp();
-  
+
   // Editor State
   const [code, setCode] = useState(DEFAULT_CODE);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isRunning, setIsRunning] = useState(false);
-  
+
   // Confirmation dialogs
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showClearDialog, setShowClearDialog] = useState(false);
-  
+
   // Resizable Layout State
   const [editorWidth, setEditorWidth] = useState(60);
   const [isDragging, setIsDragging] = useState(false);
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const originalConsoleRef = useRef({ log: console.log, error: console.error, warn: console.warn, info: console.info });
   const cleanupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -104,7 +104,7 @@ export default function PlaygroundPage() {
       clearTimeout(cleanupTimerRef.current);
       cleanupTimerRef.current = null;
     }
-    
+
     // Check rate limit
     const rateLimit = checkRateLimit('playground');
     if (!rateLimit.allowed) {
@@ -118,22 +118,46 @@ export default function PlaygroundPage() {
       showToast.error(errorMsg);
       return;
     }
-    
+
     setIsRunning(true);
     setLogs([]);
 
+    const formatValue = (val: unknown): string => {
+      if (val === undefined) return 'undefined';
+      if (val === null) return 'null';
+      if (val instanceof Promise) return 'Promise { <pending> }';
+      if (typeof val === 'object') {
+        try {
+          return JSON.stringify(val, null, 2);
+        } catch {
+          return String(val);
+        }
+      }
+      return String(val);
+    };
+
     const proxyLog = (type: LogType, args: unknown[]) => {
       const content = args.map(arg => {
-        if (arg === undefined) return 'undefined';
-        if (arg === null) return 'null';
-        if (typeof arg === 'object') {
-          try {
-            return JSON.stringify(arg, null, 2);
-          } catch {
-            return String(arg);
-          }
+        // Handle Promises: show pending state and log result when settled
+        if (arg instanceof Promise) {
+          arg
+            .then((resolved) => {
+              setLogs(prev => [...prev, {
+                type: LogType.INFO,
+                content: `Promise resolved → ${formatValue(resolved)}`,
+                timestamp: new Date().toLocaleTimeString()
+              }]);
+            })
+            .catch((rejected) => {
+              setLogs(prev => [...prev, {
+                type: LogType.ERROR,
+                content: `Promise rejected → ${formatValue(rejected)}`,
+                timestamp: new Date().toLocaleTimeString()
+              }]);
+            });
+          return 'Promise { <pending> }';
         }
-        return String(arg);
+        return formatValue(arg);
       }).join(' ');
 
       const newEntry: LogEntry = {
@@ -141,9 +165,9 @@ export default function PlaygroundPage() {
         content,
         timestamp: new Date().toLocaleTimeString()
       };
-      
+
       setLogs(prev => [...prev, newEntry]);
-      
+
       // Also log to original console
       switch (type) {
         case LogType.ERROR:
@@ -182,12 +206,12 @@ export default function PlaygroundPage() {
 
     try {
       await new Promise(resolve => setTimeout(resolve, 50));
-      
+
       // Wrap in async IIFE to support top-level await and guard closing braces from trailing single-line comments
       const asyncCode = `(async () => {\n${code}\n})()`;
       const func = new Function(asyncCode);
       await func();
-      
+
       // Show success toast if execution completed without errors
       showToast.success('Code executed successfully');
     } catch (err: unknown) {
@@ -200,7 +224,7 @@ export default function PlaygroundPage() {
       showToast.error(`Runtime error: ${errorMsg}`);
     } finally {
       setIsRunning(false);
-      
+
       cleanupTimerRef.current = setTimeout(() => {
         console.log = originalConsoleRef.current.log;
         console.error = originalConsoleRef.current.error;
@@ -263,7 +287,7 @@ export default function PlaygroundPage() {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#1a1a1a] text-[#eff1f6] font-sans">
-      
+
       <nav className="h-16 bg-dark-bg/80 backdrop-blur-md border-b border-dark-border flex items-center justify-between px-4 sm:px-6 lg:px-8 shrink-0 select-none">
         {/* Left: Logo & Title */}
         <div className="flex items-center gap-6">
@@ -275,7 +299,7 @@ export default function PlaygroundPage() {
               Frontend<span className="text-primary-400">Dummies</span>
             </span>
           </Link>
-          
+
           <div className="hidden sm:flex items-center gap-2 text-[#9ca3af]">
             <span className="text-[#444]">/</span>
             <div className="flex items-center gap-2">
@@ -284,10 +308,10 @@ export default function PlaygroundPage() {
             </div>
           </div>
         </div>
-        
+
         {/* Right: Actions */}
         <div className="flex items-center gap-3">
-          <LinkButton 
+          <LinkButton
             href="/"
             variant={ButtonVariant.GHOST}
             size={ButtonSize.SM}
@@ -295,8 +319,8 @@ export default function PlaygroundPage() {
           >
             Home
           </LinkButton>
-          
-          <Button 
+
+          <Button
             onClick={handleReset}
             variant={ButtonVariant.GHOST}
             size={ButtonSize.SM}
@@ -305,9 +329,9 @@ export default function PlaygroundPage() {
           >
             Reset
           </Button>
-          
-          <Button 
-            onClick={handleRunCode} 
+
+          <Button
+            onClick={handleRunCode}
             disabled={isRunning}
             variant={ButtonVariant.PRIMARY}
             size={ButtonSize.SM}
@@ -324,13 +348,13 @@ export default function PlaygroundPage() {
       </nav>
 
 
-      <div 
+      <div
         ref={containerRef}
         className="flex-1 flex min-h-0 p-3 overflow-hidden bg-[#1a1a1a]"
       >
-        
+
         {/* LEFT PANEL: Code Editor */}
-        <div 
+        <div
           className="flex flex-col bg-[#262626] rounded-2xl overflow-hidden border border-[#333] min-w-[300px]"
           style={{ width: `${editorWidth}%` }}
         >
@@ -400,7 +424,7 @@ export default function PlaygroundPage() {
         </div>
 
         {/* Resizer */}
-        <div 
+        <div
           className={`${styles.resizerV} flex items-center justify-center hover:bg-primary-500/50 rounded-[6px] ${isDragging ? styles.active : ''}`}
           onMouseDown={handleMouseDown}
         >
@@ -408,7 +432,7 @@ export default function PlaygroundPage() {
         </div>
 
         {/* RIGHT PANEL: Console */}
-        <div 
+        <div
           className="flex flex-col bg-[#262626] rounded-2xl overflow-hidden border border-[#333] min-w-[250px]"
           style={{ width: `calc(${100 - editorWidth}% - 4px)` }}
         >
@@ -418,8 +442,8 @@ export default function PlaygroundPage() {
               Console
             </div>
             {logs.length > 0 && (
-              <Button 
-                onClick={handleClearConsole} 
+              <Button
+                onClick={handleClearConsole}
                 variant={ButtonVariant.GHOST}
                 size={ButtonSize.SM}
                 className="flex items-center gap-1 text-xs text-[#9ca3af] hover:text-white"
@@ -429,7 +453,7 @@ export default function PlaygroundPage() {
               </Button>
             )}
           </div>
-          
+
           <div className="flex-1 overflow-y-auto p-4 font-mono text-sm bg-[#262626]">
             {logs.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-[#555]">
@@ -440,11 +464,10 @@ export default function PlaygroundPage() {
             ) : (
               <div className="bg-[#1e1e1e] rounded-[12px] border border-[#333] overflow-hidden">
                 {logs.map((log, index) => (
-                  <div 
-                    key={index} 
-                    className={`flex items-start gap-2 px-4 py-2 text-sm ${
-                      index !== logs.length - 1 ? 'border-b border-[#333]' : ''
-                    } ${log.type === LogType.ERROR ? 'text-red-400 bg-red-900/5' : log.type === LogType.WARN ? 'text-yellow-400 bg-yellow-900/5' : 'text-[#eff1f6]'}`}
+                  <div
+                    key={index}
+                    className={`flex items-start gap-2 px-4 py-2 text-sm ${index !== logs.length - 1 ? 'border-b border-[#333]' : ''
+                      } ${log.type === LogType.ERROR ? 'text-red-400 bg-red-900/5' : log.type === LogType.WARN ? 'text-yellow-400 bg-yellow-900/5' : 'text-[#eff1f6]'}`}
                   >
                     <div className="mt-0.5 shrink-0 opacity-60">
                       {getLogIcon(log.type)}
@@ -458,7 +481,7 @@ export default function PlaygroundPage() {
           </div>
         </div>
       </div>
-      
+
       {/* Confirmation Dialogs */}
       <ConfirmDialog
         isOpen={showResetDialog}
@@ -469,7 +492,7 @@ export default function PlaygroundPage() {
         confirmText="Reset"
         cancelText="Cancel"
       />
-      
+
       <ConfirmDialog
         isOpen={showClearDialog}
         onClose={() => setShowClearDialog(false)}
