@@ -1,6 +1,7 @@
 import { Template, Category } from '@/types/types';
 import { JS_OUTPUT_CHALLENGES_SNIPPETS } from '@/data/snippets/js-output-challenges';
 import { DEBOUNCE_STARTER_CODE } from '@/data/starter-code/debounce';
+import { RETRY_PROMISE_STARTER_CODE } from '@/data/starter-code/retry-promise';
 import commentsImage from '@/data/assets/comments.png';
 import criticalRenderingPathImage from '@/data/assets/crp.png';
 import { PROMISE_OUTPUT_CHALLENGES_SNIPPETS } from '@/data/snippets/promise-output-challenges';
@@ -175,5 +176,33 @@ The key insight with debouncing is that we reset the timer every time the functi
     author: 'modernDev',
     createdAt: '2025-12-17',
     goal: 'Understand the critical rendering path and how to optimize it. This will help you to build faster and more responsive websites.'
+  },
+  {
+    id: '11',
+    name: 'Promise Retry',
+    slug: 'retry-promise',
+    shortDescription: 'Implement a retry function that handles transient failures by retrying async operations with optional delays.',
+    fullDescription: `Retry logic is essential for building resilient applications. Network requests, database connections, and API calls can fail temporarily due to server overload, rate limiting, or network issues.
+
+In this challenge, you'll implement a retry function that automatically retries a failing async operation a specified number of times. You'll work with a mock API that fails N times before succeeding, simulating real-world transient failures.
+
+Key concepts you'll practice:
+- Promise chaining and error handling
+- Async/await patterns
+- Closures for state management
+- Recursive vs iterative implementations
+`,
+    editorial: '',
+    imageUrl: 'https://placehold.co/800x600/10b981/ffffff/png?text=Promise+Retry',
+    demoUrl: '#',
+    githubUrl: 'https://github.com/pratikkumar399/frontendfordummies/tree/main/src/data/starter-code/retry-promise.ts',
+    tags: ['Medium', 'Promises', 'Async'],
+    category: Category.JAVASCRIPT,
+    techStack: ['JavaScript', 'Promises', 'Async/Await'],
+    author: 'modernDev',
+    createdAt: '2025-12-21',
+    starterCode: RETRY_PROMISE_STARTER_CODE,
+    goal: 'Implement a retry function that handles transient failures. Bonus: Add exponential backoff with jitter.',
+    directToPractice: true
   },
 ];
