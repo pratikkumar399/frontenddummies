@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import Editor, { OnMount } from '@monaco-editor/react';
@@ -34,7 +34,16 @@ interface PracticeClientProps {
   editorial: string | null;
 }
 
-export function PracticeClient({ slug, editorial }: PracticeClientProps) {
+// Wrapper component that provides Suspense boundary for useSearchParams
+export function PracticeClient(props: PracticeClientProps) {
+  return (
+    <Suspense fallback={<PageLoader title="Loading practice..." subtitle="Setting up your practice environment..." />}>
+      <PracticeClientInner {...props} />
+    </Suspense>
+  );
+}
+
+function PracticeClientInner({ slug, editorial }: PracticeClientProps) {
   const { templates } = useApp();
   const router = useRouter();
   const pathname = usePathname();
@@ -377,11 +386,10 @@ export function PracticeClient({ slug, editorial }: PracticeClientProps) {
               onClick={() => updateTabQuery(PracticeTab.DESCRIPTION)}
               variant={ButtonVariant.GHOST}
               size={ButtonSize.SM}
-              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-t-md transition-colors ${
-                activeTab === PracticeTab.DESCRIPTION
+              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-t-md transition-colors ${activeTab === PracticeTab.DESCRIPTION
                   ? 'bg-[#262626] text-white border-t border-x border-[#3e3e3e] relative -bottom-[1px]'
                   : 'text-[#9ca3af] hover:text-white'
-              }`}
+                }`}
               icon={<FileText size={13} className="text-blue-500" />}
             >
               Description
@@ -390,11 +398,10 @@ export function PracticeClient({ slug, editorial }: PracticeClientProps) {
               onClick={() => updateTabQuery(PracticeTab.EDITORIAL)}
               variant={ButtonVariant.GHOST}
               size={ButtonSize.SM}
-              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-t-md transition-colors ${
-                activeTab === PracticeTab.EDITORIAL
+              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-t-md transition-colors ${activeTab === PracticeTab.EDITORIAL
                   ? 'bg-[#262626] text-white border-t border-x border-[#3e3e3e] relative -bottom-[1px]'
                   : 'text-[#9ca3af] hover:text-white'
-              }`}
+                }`}
               icon={<Code2 size={13} className="text-orange-500" />}
             >
               Editorial
