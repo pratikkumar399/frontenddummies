@@ -1,14 +1,7 @@
-export const DEBOUNCE_STARTER_CODE = `/**
- * @param {Function} func
- * @param {number} wait
- * @return {Function}
- */
-
-function debounce(func, wait) {
-  // Your code here
+export const DEBOUNCE_STARTER_CODE = `function debounce(func, wait) {
+  
 }
 
-// Test your code here
 const log = () => console.log('Fired!');
 const debouncedLog = debounce(log, 1000);
 
