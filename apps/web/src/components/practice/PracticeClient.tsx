@@ -631,39 +631,44 @@ function PracticeClientInner({ slug, editorial }: PracticeClientProps) {
                   <div className="mb-2 opacity-50">Run code to see output</div>
                 </div>
               ) : (
-                <div className="space-y-2 pb-4">
-                  {(() => {
-                    const hasError = logs.some(log => log.type === LogType.ERROR);
-                    const firstErrorIdx = logs.findIndex(log => log.type === LogType.ERROR);
-                    const heading = hasError ? 'Runtime Error' : 'Standard Output';
-                    const icon = hasError ? <AlertCircle size={12} /> : <CheckCircle2 size={12} />;
-                    const textColor = hasError ? 'text-red-400' : 'text-[#9ca3af]';
-                    const timestamp =
-                      hasError
-                        ? logs[firstErrorIdx].timestamp
-                        : logs.length > 0
-                          ? logs[logs.length - 1].timestamp
-                          : '';
-
-                    const boxClasses = hasError
-                      ? 'bg-red-900/10 border-red-900/30 text-red-300'
-                      : 'bg-[#333]/50 border-[#3e3e3e] text-[#eff1f6]';
-
-                    const output = logs.map(log => log.content).join('\n');
+                <div className="bg-[#1e1e1e] rounded-[12px] border border-[#333] overflow-hidden">
+                  {logs.map((log, index) => {
+                    const getLogIcon = (type: LogType) => {
+                      switch (type) {
+                        case LogType.ERROR:
+                          return <AlertCircle size={12} className="text-red-400" />;
+                        case LogType.WARN:
+                          return <AlertCircle size={12} className="text-yellow-400" />;
+                        case LogType.INFO:
+                          return <CheckCircle2 size={12} className="text-blue-400" />;
+                        default:
+                          return <CheckCircle2 size={12} className="text-green-400" />;
+                      }
+                    };
 
                     return (
-                      <div className="animate-fadeIn">
-                        <div className={`flex items-start gap-2 text-xs mb-1 ${textColor}`}>
-                          {icon}
-                          <span>{heading}</span>
-                          <span className="opacity-50 ml-auto">{timestamp}</span>
+                      <div
+                        key={index}
+                        className={`flex items-start gap-2 px-4 py-2 text-sm ${
+                          index !== logs.length - 1 ? 'border-b border-[#333]' : ''
+                        } ${
+                          log.type === LogType.ERROR
+                            ? 'text-red-400 bg-red-900/5'
+                            : log.type === LogType.WARN
+                            ? 'text-yellow-400 bg-yellow-900/5'
+                            : 'text-[#eff1f6]'
+                        }`}
+                      >
+                        <div className="mt-0.5 shrink-0 opacity-60">
+                          {getLogIcon(log.type)}
                         </div>
-                        <div className={`p-3 rounded-md text-sm border ${boxClasses}`}>
-                          <pre className="whitespace-pre-wrap font-mono text-xs">{output}</pre>
-                        </div>
+                        <pre className="whitespace-pre-wrap font-mono text-xs flex-1 overflow-x-auto">
+                          {log.content}
+                        </pre>
+                        <span className="text-[10px] opacity-40 shrink-0">{log.timestamp}</span>
                       </div>
                     );
-                  })()}
+                  })}
                 </div>
               )}
             </div>

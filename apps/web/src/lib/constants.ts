@@ -2,6 +2,7 @@ import { Template, Category } from '@/types/types';
 import { JS_OUTPUT_CHALLENGES_SNIPPETS } from '@/data/snippets/js-output-challenges';
 import { DEBOUNCE_STARTER_CODE } from '@/data/starter-code/debounce';
 import { RETRY_PROMISE_STARTER_CODE } from '@/data/starter-code/retry-promise';
+import { PROMISE_ALL_STARTER_CODE } from '@/data/starter-code/promise-all';
 import commentsImage from '@/data/assets/comments.png';
 import criticalRenderingPathImage from '@/data/assets/crp.png';
 import { PROMISE_OUTPUT_CHALLENGES_SNIPPETS } from '@/data/snippets/promise-output-challenges';
@@ -203,6 +204,50 @@ Key concepts you'll practice:
     createdAt: '2025-12-21',
     starterCode: RETRY_PROMISE_STARTER_CODE,
     goal: 'Implement a retry function that handles transient failures. Bonus: Add exponential backoff with jitter.',
+    directToPractice: true
+  },
+  {
+    id: '12',
+    name: 'Promise.all Polyfill',
+    slug: 'promise-all-polyfill',
+    shortDescription: 'Implement your own Promise.all polyfill to understand how concurrent Promise handling works under the hood.',
+    fullDescription: `Promise.all is one of the most powerful Promise utility methods in JavaScript. It allows you to execute multiple Promises concurrently and wait for all of them to complete. Understanding how it works internally is crucial for mastering asynchronous JavaScript.
+
+In this challenge, you'll implement a polyfill for Promise.all from scratch. This will deepen your understanding of:
+- How Promises work internally
+- Concurrent vs sequential execution
+- Error handling in Promise chains
+- Maintaining order of results regardless of completion order
+- Fail-fast behavior when any Promise rejects
+
+Requirements:
+
+Your implementation must:
+1. Accept an array of Promises (or any values) as input
+2. Return a Promise that resolves with an array of results
+3. Maintain the order of results matching the input order (even if Promises resolve out of order)
+4. Implement fail-fast behavior: if any Promise rejects, immediately reject with that error
+5. Handle empty arrays by resolving with an empty array
+6. Convert non-Promise values to resolved Promises (using Promise.resolve)
+
+Key Concepts:
+- Concurrent Execution: All Promises start executing immediately, not sequentially
+- Order Preservation: Results must match input order, regardless of which Promise completes first
+- Fail-Fast: The first rejection should immediately reject the entire operation
+- Promise Resolution: Non-Promise values should be treated as already-resolved Promises
+
+This challenge tests your ability to manage asynchronous state, handle edge cases, and understand the fundamental mechanics of Promise composition.`,
+    editorial: "",
+    imageUrl: 'https://placehold.co/800x600/8b5cf6/ffffff/png?text=Promise.all+Polyfill',
+    demoUrl: '#',
+    githubUrl: 'https://github.com/pratikkumar399/frontendfordummies/tree/main/src/data/starter-code/promise-all.ts',
+    tags: ['Medium', 'Promises', 'Polyfill', 'Concurrency'],
+    category: Category.JAVASCRIPT,
+    techStack: ['JavaScript', 'Promises', 'Async/Await'],
+    author: 'modernDev',
+    createdAt: '2025-12-22',
+    starterCode: PROMISE_ALL_STARTER_CODE,
+    goal: 'Implement a Promise.all polyfill that handles concurrent Promises, maintains order, and implements fail-fast error handling.',
     directToPractice: true
   },
 ];
