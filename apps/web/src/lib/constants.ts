@@ -192,7 +192,7 @@ Key concepts you'll practice:
 - Closures for state management
 - Recursive vs iterative implementations
 `,
-    editorial: '',
+    editorial: "",
     imageUrl: 'https://placehold.co/800x600/10b981/ffffff/png?text=Promise+Retry',
     demoUrl: '#',
     githubUrl: 'https://github.com/pratikkumar399/frontendfordummies/tree/main/src/data/starter-code/retry-promise.ts',
