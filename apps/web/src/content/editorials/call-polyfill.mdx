@@ -1,0 +1,52 @@
+### Implementing a `Function.prototype.call` Polyfill
+
+The real `call`:
+- invokes a function immediately,
+- lets you choose the `this` value,
+- forwards arguments in order,
+- throws if called on a non-function.
+
+
+### Requirements:
+1) Validate that "this" is a function, otherwise throw a TypeError
+2) "thisArg" should default to the global object when null/undefined
+3) Support primitive thisArg values by boxing them (Number, String, Boolean)
+4) Do not leak temp properties - clean up before returning
+5) Return the invoked function's return value
+6) Preserve argument order and length
+7) Avoid property name collisions when attaching the temp function
+
+### Implementation
+
+```javascript
+// call polyfill
+Function.prototype.myCall = function (thisArg, ...argArray) {
+  if (typeof this !== "function") {
+    throw new TypeError("myCall must be called on a function");
+  }
+
+  // default to global object when null/undefined, box primitives
+  const context =
+    thisArg === null || thisArg === undefined ? globalThis : Object(thisArg);
+
+  // unique key to avoid overwriting existing properties
+  const fnKey = Symbol("fn");
+  context[fnKey] = this;
+
+  const result = context[fnKey](...argArray);
+  delete context[fnKey];
+
+  return result;
+};
+```
+
+### Edge Cases Covered
+- Non-function `this` -> throws `TypeError`.
+- `null`/`undefined` -> safely uses `globalThis`.
+- Primitive contexts -> boxed via `Object(...)`.
+- Temp property collisions -> avoided with `Symbol`.
+- Return value bubbles back just like native `call`.
+
+### Complexity
+- Time: **O(n)** where *n* is argument count (spread).  
+- Space: **O(1)** extra (single symbol reference).

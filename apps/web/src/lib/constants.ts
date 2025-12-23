@@ -3,8 +3,10 @@ import { JS_OUTPUT_CHALLENGES_SNIPPETS } from '@/data/snippets/js-output-challen
 import { DEBOUNCE_STARTER_CODE } from '@/data/starter-code/debounce';
 import { RETRY_PROMISE_STARTER_CODE } from '@/data/starter-code/retry-promise';
 import { PROMISE_ALL_STARTER_CODE } from '@/data/starter-code/promise-all';
+import { CALL_POLYFILL_STARTER_CODE } from '@/data/starter-code/call';
 import commentsImage from '@/data/assets/comments.png';
 import criticalRenderingPathImage from '@/data/assets/crp.png';
+import clientSideRateLimiterImage from '@/data/assets/rate-limiter.png';
 import { PROMISE_OUTPUT_CHALLENGES_SNIPPETS } from '@/data/snippets/promise-output-challenges';
 
 export const INITIAL_TEMPLATES: Template[] = [
@@ -250,4 +252,49 @@ This challenge tests your ability to manage asynchronous state, handle edge case
     goal: 'Implement a Promise.all polyfill that handles concurrent Promises, maintains order, and implements fail-fast error handling.',
     directToPractice: true
   },
+  {
+    id: '13',
+    name: 'Function.prototype.call Polyfill',
+    slug: 'call-polyfill',
+    shortDescription: 'Recreate Function.prototype.call to control this binding and argument forwarding safely.',
+    fullDescription: `The native Function.prototype.call lets you invoke a function with an explicit "this" value and positional arguments. Rebuilding it from scratch forces you to reason about execution context, boxing primitives, and avoiding property collisions.
+
+In this challenge, implement a polyfill that mirrors call's behavior:
+- Validate that it is invoked on a function.
+- Default null/undefined to the global object.
+- Box primitive contexts so "this" is still an object.
+- Avoid mutating user properties by using a collision-safe key.
+- Clean up temporary state after invocation.
+- Return the called function's result.
+`,
+    editorial: '',
+    imageUrl: 'https://placehold.co/800x600/14b8a6/ffffff/png?text=call+polyfill',
+    demoUrl: '#',
+    githubUrl: 'https://github.com/pratikkumar399/frontendfordummies/tree/main/apps/web/src/data/starter-code/call.ts',
+    tags: ['Medium', 'this binding', 'Polyfill', 'Functions'],
+    category: Category.JAVASCRIPT,
+    techStack: ['JavaScript', 'Functions', 'this'],
+    author: 'modernDev',
+    createdAt: '2025-12-23',
+    starterCode: CALL_POLYFILL_STARTER_CODE,
+    goal: 'Implement Function.prototype.call with correct this handling, primitive boxing, and collision-free temporary storage.',
+    directToPractice: true
+  },
+  {
+    id: '14',
+    name: 'Client-Side Rate Limiter',
+    slug: 'client-side-rate-limiter',
+    shortDescription: 'How I built a simple, client-only rate limiter to keep code execution fast, safe, and predictable without any backend dependency.',
+    fullDescription: 'In this post, I\'ll walk through a simple, client-only rate limiter that keeps code execution fast, safe, and predictable—without any backend dependency.',
+    imageUrl: clientSideRateLimiterImage.src,
+    demoUrl: '#',
+    githubUrl: '#',
+    tags: ['Medium', 'Rate Limiter', 'Client-Side'],
+    category: Category.BLOGS,
+    techStack: ['JavaScript', 'Rate Limiter', 'Client-Side', 'Frontend'],
+    author: 'modernDev',
+    createdAt: '2025-12-22',
+    goal: 'Implement a client-side rate limiter to prevent abuse of the code execution.',
+    directToPractice: true
+  }
 ];

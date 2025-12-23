@@ -1,0 +1,344 @@
+Interactive coding environments allow users to execute code repeatedly. Without constraints, this can lead to:
+
+- Excessive CPU usage in the browser
+- Degraded performance for the user
+- Accidental abuse via rapid clicks or loops
+- Increased backend or execution service load (if present)
+
+The system needs a lightweight execution throttle that limits how frequently code can be run while preserving a smooth developer experience.
+
+
+## Design Goals
+
+The rate limiter is intentionally **pragmatic and UX-focused**, not security-focused. It's designed to:
+
+- **Prevent accidental or excessive execution**, not malicious abuse
+- **Stay entirely client-side**, no server round trips
+- **Work in SSR setups (Next.js)** without crashing on `window` or `localStorage`
+- **Degrade gracefully** if browser storage is unavailable
+- **Be simple to explain and debug**
+
+Things it explicitly **does not** try to do:
+
+- Enforce hard security guarantees
+- Track users across devices or sessions  
+- Prevent a determined user from bypassing the limit
+
+This is a **guardrail**, not a firewall.
+
+## The Core Idea: Fixed-Window Counter
+
+The system uses a classic **fixed-window rate limiter**:
+
+- Choose a **window duration** (e.g. 60 seconds)
+- Choose a **max number of executions** allowed in that window (e.g. 10)
+- Keep a simple counter of how many executions occurred in the current window
+
+**Configuration:**
+
+```typescript
+const EXECUTIONS_PER_MINUTE = 10;
+const WINDOW_DURATION_MS = 60 * 1000; // 1 minute
+```
+
+On each execution attempt:
+
+1. Load the stored state from `localStorage` (if any)
+2. If there's no state, create a new window starting now
+3. If the current time has passed the stored `resetTime`, start a fresh window
+4. If the count is below the max, increment and allow
+5. If the count has reached the max, **block** and tell the user when they can try again
+
+The stored entry is simple:
+
+```typescript
+interface RateLimitEntry {
+  count: number;      // executions in the current window
+  resetTime: number;  // timestamp when the window resets
+}
+```
+
+## Per-Page Isolation
+
+Different pages in the app have different execution contexts (e.g. practice, playground, snippet practice). They shouldn't share a rate limit.
+
+To keep them isolated, the limiter uses **namespaced keys**:
+
+```typescript
+function getStorageKey(page: 'practice' | 'playground' | 'snippet-practice'): string {
+  return `rate_limit_${page}`;
+}
+```
+
+This guarantees:
+- Heavy use on one page doesn't throttle another
+- Each feature can be reasoned about independently
+
+## Public API: How the UI Uses It
+
+The main entrypoint is a **single function** you call before executing any user code:
+
+```typescript
+export interface RateLimitResult {
+  allowed: boolean;
+  retryAfter?: number;  // seconds until next allowed execution
+  remaining?: number;   // remaining executions in current window
+}
+
+export function checkRateLimit(
+  page: 'practice' | 'playground' | 'snippet-practice'
+): RateLimitResult
+```
+
+**Typical UI flow:**
+
+1. User clicks **Run**
+2. Call `checkRateLimit(page)`
+3. Branch on the response:
+
+**If `allowed: true`**
+- Proceed with code execution
+- Optionally show "You have X runs left this minute" using `remaining`
+
+**If `allowed: false`**
+- Block execution
+- Show a friendly message like:
+  > "You've hit the rate limit. Try again in 12 seconds."
+
+There are also two supporting APIs:
+
+```typescript
+// Reset the rate limit (useful for testing)
+resetRateLimit(page: 'practice' | 'playground' | 'snippet-practice'): void
+
+// Check remaining without consuming an execution
+getRemainingExecutions(page: 'practice' | 'playground' | 'snippet-practice'): number | null
+```
+
+This keeps the UI logic clean and makes the limiter easy to integrate in multiple places.
+
+``` typescript
+localStorage
+└── rate_limit_<page>
+    ├── count: number
+    └── resetTime: timestamp
+```
+
+## Implementation Details
+
+Here's the complete implementation of `checkRateLimit`:
+
+```typescript
+export function checkRateLimit(
+  page: 'practice' | 'playground' | 'snippet-practice'
+): RateLimitResult {
+  if (typeof window === 'undefined') {
+    // Server-side: always allow (rate limiting is client-side only)
+    return { allowed: true };
+  }
+
+  const storageKey = getStorageKey(page);
+  const now = Date.now();
+
+  try {
+    const stored = localStorage.getItem(storageKey);
+    
+    if (!stored) {
+      // First execution: create new entry
+      const entry: RateLimitEntry = {
+        count: 1,
+        resetTime: now + WINDOW_DURATION_MS,
+      };
+      localStorage.setItem(storageKey, JSON.stringify(entry));
+      return {
+        allowed: true,
+        remaining: EXECUTIONS_PER_MINUTE - 1,
+      };
+    }
+
+    const entry: RateLimitEntry = JSON.parse(stored);
+
+    // Check if window has expired
+    if (now >= entry.resetTime) {
+      // Reset the window
+      const newEntry: RateLimitEntry = {
+        count: 1,
+        resetTime: now + WINDOW_DURATION_MS,
+      };
+      localStorage.setItem(storageKey, JSON.stringify(newEntry));
+      return {
+        allowed: true,
+        remaining: EXECUTIONS_PER_MINUTE - 1,
+      };
+    }
+
+    // Window is still active
+    if (entry.count >= EXECUTIONS_PER_MINUTE) {
+      // Rate limit exceeded
+      const retryAfter = Math.ceil((entry.resetTime - now) / 1000);
+      return {
+        allowed: false,
+        retryAfter,
+      };
+    }
+
+    // Increment count
+    entry.count += 1;
+    localStorage.setItem(storageKey, JSON.stringify(entry));
+    
+    return {
+      allowed: true,
+      remaining: EXECUTIONS_PER_MINUTE - entry.count,
+    };
+  } catch (error) {
+    // If localStorage fails (e.g., in private browsing), allow execution
+    // This is a graceful degradation
+    console.warn('Rate limiter: localStorage access failed', error);
+    return { allowed: true };
+  }
+}
+```
+
+**Key aspects of this implementation:**
+
+- **SSR-safe**: Early return when `window` is not defined
+- **Four distinct paths**: first execution, expired window, over limit, under limit
+- **Defensive `try/catch`** around `localStorage` usage
+- **Fail-open behavior**: if storage breaks, we **don't** block the user
+- **User-friendly data**: `remaining` and `retryAfter` are ready for UI consumption
+
+## Error Handling and Degraded Mode
+
+Browsers can (and do) fail `localStorage` reads/writes in some scenarios:
+
+- Private/incognito mode with strict settings
+- Full storage quota  
+- User or extensions blocking access
+
+Rather than punishing the user for that, the limiter chooses:
+
+- **If storage fails → allow execution**
+- Log a warning so it's debuggable in development
+- Accept that in rare cases, the limiter won't be enforced
+
+This is a **conscious tradeoff**:
+
+> "A broken limiter should never prevent someone from learning or experimenting."
+
+## Tradeoffs and Edge Cases
+
+
+### Fixed-Window Bursting
+
+A user can run code at the end of one window and immediately again at the beginning of the next, briefly exceeding the "average" rate.
+
+**Tradeoff:** For UX-focused throttling, this is totally fine.
+
+### Multi-Tab Behavior
+
+Different tabs share the same `localStorage` entry, but writes are not synchronized in a strongly consistent way.
+
+**Tradeoff:** In practice, it's rare for users to spam "Run" across many tabs simultaneously, so we accept the minor risk.
+
+### Client Trust
+
+Users can clear storage, edit devtools values, or change system time.
+
+**Tradeoff:** This limiter is **not** meant to stop a determined attacker, only to prevent accidental overload.
+
+## How This Feels in the UI
+
+When wired into the UI, the experience can be very friendly:
+
+**Normal usage:**
+- "Run" always works, and maybe you see a subtle indicator like "7/10 runs left this minute."
+
+**Heavy usage:**
+- After hitting the limit, the button might disable and a small tooltip appears:
+  > "You've hit the limit of 10 runs per minute. Try again in 23s."
+
+**Dev / QA:**
+- There might be a hidden "Reset rate limit" action that calls `resetRateLimit(page)` so you can quickly test behavior without waiting.
+
+The final result: **smooth interactions by default, guardrails when needed, and no surprises.**
+
+## Example Integration
+
+Here's how you might wire this into a React component:
+
+```tsx
+function CodeEditor({ page }: { page: 'practice' | 'playground' | 'snippet-practice' }) {
+  const [status, setStatus] = useState<string>('');
+  const [isRunning, setIsRunning] = useState(false);
+
+  const handleRun = async () => {
+    const result = checkRateLimit(page);
+
+    if (!result.allowed) {
+      setStatus(`Rate limit exceeded. Try again in ${result.retryAfter}s.`);
+      return;
+    }
+
+    setIsRunning(true);
+    setStatus('');
+    
+    try {
+      await executeCode();
+      
+      if (result.remaining !== undefined && result.remaining <= 3) {
+        setStatus(`${result.remaining} runs remaining this minute`);
+      }
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={handleRun} disabled={isRunning}>
+        {isRunning ? 'Running...' : 'Run Code'}
+      </button>
+      {status && <div className="text-sm text-muted-foreground mt-2">{status}</div>}
+    </div>
+  );
+}
+```
+
+You can also show remaining executions proactively:
+
+```tsx
+function ExecutionBadge({ page }: { page: 'practice' | 'playground' | 'snippet-practice' }) {
+  const remaining = getRemainingExecutions(page);
+  
+  if (remaining === null) return null;
+  
+  return (
+    <Badge variant={remaining <= 3 ? 'warning' : 'default'}>
+      {remaining} / {EXECUTIONS_PER_MINUTE} runs left
+    </Badge>
+  );
+}
+```
+
+## Possible Future Upgrades
+
+If requirements tighten or usage grows, this client-side limiter can evolve:
+
+- **Token bucket** for smoother burst handling
+- **Sliding window** for more accurate enforcement
+- **Cross-tab sync** using the `storage` event
+- **Server-side enforcement** layered on top for authenticated users
+- **Per-user quotas** based on auth/session data
+
+But even in its current form, it already hits an important sweet spot: **simple, local, and good enough for most educational and interactive environments.**
+
+## Takeaways
+
+- You don't need a backend to protect your app from excessive usage.
+- A **tiny client-side rate limiter** can dramatically improve UX by preventing runaway execution.
+- Storing a **simple counter and reset timestamp in `localStorage`** is often all you need.
+- Designing for **degraded mode** and **clarity** matters more than perfect enforcement in user-facing tools.
+
+---
+
+*Have you built similar client-side protection mechanisms? I'd love to hear about your approach in the comments below.*

@@ -30,6 +30,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "src/content/articles/client-side-rate-limiter.mdx"  ],
   "exclude": ["node_modules"]
 }

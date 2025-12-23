@@ -126,6 +126,40 @@ export default function PlaygroundPage() {
       if (val === undefined) return 'undefined';
       if (val === null) return 'null';
       if (val instanceof Promise) return 'Promise { <pending> }';
+
+      if (Array.isArray(val)) {
+        const target = val as unknown as Record<string, unknown>;
+        const keys = Object.keys(target);
+
+        const isArrayIndex = (key: string) => {
+          const n = Number(key);
+          return Number.isInteger(n) && n >= 0 && String(n) === key;
+        };
+
+        const indexKeys = keys.filter(isArrayIndex).sort((a, b) => Number(a) - Number(b));
+        const nonIndexKeys = keys.filter(k => !isArrayIndex(k));
+
+        const indexParts = indexKeys.map(k => {
+          const v = target[k];
+          if (typeof v === 'string') {
+            return `'${v}'`;
+          }
+          return formatValue(v);
+        });
+
+        const nonIndexParts = nonIndexKeys.map(k => {
+          const v = target[k];
+          const valueStr = typeof v === 'string' ? `'${v}'` : formatValue(v);
+          return `'${k}': ${valueStr}`;
+        });
+
+        if (indexParts.length === 0 && nonIndexParts.length === 0) {
+          return '[]';
+        }
+
+        return `[ ${[...indexParts, ...nonIndexParts].join(', ')} ]`;
+      }
+
       if (typeof val === 'object') {
         try {
           return JSON.stringify(val, null, 2);
@@ -133,6 +167,11 @@ export default function PlaygroundPage() {
           return String(val);
         }
       }
+
+      if (typeof val === 'string') {
+        return val;
+      }
+
       return String(val);
     };
 
