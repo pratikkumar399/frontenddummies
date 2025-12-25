@@ -1,5 +1,5 @@
 import React from 'react';
-import { getChallengeBySlug } from '@/lib/challenges';
+import { getChallengeBySlug, getAllSlugs, getRelatedChallenges } from '@/lib/challenges';
 import { BackButton } from '@/components/design-detail/BackButton';
 import { ChallengeDescriptionServer } from '@/components/design-detail/ChallengeDescriptionServer';
 import Image from 'next/image';
@@ -8,11 +8,20 @@ import { Metadata } from 'next';
 import { Category } from '@/types/types';
 import styles from './page.module.css';
 import { GiscusComments } from '@/components/GiscusComments';
-
+import { generateTemplateMetadata, generateBlogStructuredData, generateBreadcrumbStructuredData } from '@/lib/seo';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { RelatedContent } from '@/components/RelatedContent';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
+
+export async function generateStaticParams() {
+  const slugs = getAllSlugs();
+  return slugs.map((slug) => ({
+    slug,
+  }));
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -24,19 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  return {
-    title: template.name,
-    description: template.shortDescription,
-    keywords: template.tags,
-    openGraph: {
-      title: template.name,
-      description: template.shortDescription,
-      images: [template.imageUrl],
-      type: 'article',
-      publishedTime: template.createdAt,
-      authors: [template.author],
-    },
-  };
+  return generateTemplateMetadata(template, 'blog');
 }
 
 export default async function BlogDetailPage({ params }: PageProps) {
@@ -47,34 +44,12 @@ export default async function BlogDetailPage({ params }: PageProps) {
     return notFound();
   }
 
-  // JSON-LD Structured Data
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": template.name,
-    "description": template.shortDescription,
-    "image": template.imageUrl,
-    "datePublished": template.createdAt,
-    "dateModified": template.createdAt,
-    "author": {
-      "@type": "Person",
-      "name": template.author
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Frontend Dummies",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://frontenddummies.com/favicon.ico"
-      }
-    },
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": `https://frontenddummies.com/blog/${template.slug}`
-    },
-    "keywords": template.tags.join(', '),
-    "articleBody": template.fullDescription
-  };
+  const relatedChallenges = getRelatedChallenges(slug, 3);
+  const structuredData = generateBlogStructuredData(template);
+  const breadcrumbData = generateBreadcrumbStructuredData([
+    { name: 'Blog', url: 'https://frontenddummies.com/blog' },
+    { name: template.name, url: `https://frontenddummies.com/blog/${template.slug}` },
+  ]);
 
   return (
     <>
@@ -82,12 +57,22 @@ export default async function BlogDetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
+      />
       <div className="min-h-screen bg-dark-bg pt-24 pb-12 relative overflow-hidden">
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className={`${styles.glowBlob} bg-primary-600/5 w-[800px] h-[800px] top-[0] right-[-200px] blur-[120px]`}></div>
         </div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <Breadcrumbs
+            items={[
+              { label: 'Blog', href: '/blog' },
+              { label: template.name, href: `/blog/${template.slug}` },
+            ]}
+          />
           <div className="mb-8">
             <BackButton href="/blog" />
           </div>
@@ -139,6 +124,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
                   height={1000}
                   className="w-auto h-full rounded-[12px]  object-contain opacity-90 mx-auto"
                   priority
+                  quality={90}
                 />
               </div>
 
@@ -148,8 +134,19 @@ export default async function BlogDetailPage({ params }: PageProps) {
             </div>
 
             {/* Comments */}
-            <GiscusComments />
+            <div className="mt-10" key={slug}>
+              <GiscusComments />
+            </div>
           </div>
+
+          {/* Related Content */}
+          {relatedChallenges.length > 0 && (
+            <RelatedContent
+              templates={relatedChallenges}
+              title="Related Articles"
+              viewAllHref="/blog"
+            />
+          )}
         </div>
       </div>
     </>

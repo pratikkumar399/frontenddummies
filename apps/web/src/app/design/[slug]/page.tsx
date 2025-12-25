@@ -1,5 +1,5 @@
 import React from 'react';
-import { getChallengeBySlug } from '@/lib/challenges';
+import { getChallengeBySlug, getAllSlugs, getRelatedChallenges } from '@/lib/challenges';
 import { BackButton } from '@/components/design-detail/BackButton';
 import { ChallengeActions } from '@/components/design-detail/ChallengeActions';
 import { ChallengeDescriptionServer } from '@/components/design-detail/ChallengeDescriptionServer';
@@ -8,11 +8,21 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import styles from './page.module.css';
 import { GiscusComments } from '@/components/GiscusComments';
+import { generateTemplateMetadata, generateCourseStructuredData, generateBreadcrumbStructuredData } from '@/lib/seo';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { RelatedContent } from '@/components/RelatedContent';
 
 // Define params as a Promise for Next.js 15 compatibility
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
+
+export async function generateStaticParams() {
+  const slugs = getAllSlugs();
+  return slugs.map((slug) => ({
+    slug,
+  }));
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -24,16 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  return {
-    title: template.name,
-    description: template.shortDescription,
-    keywords: template.tags,
-    openGraph: {
-      title: template.name,
-      description: template.shortDescription,
-      images: [template.imageUrl],
-    },
-  };
+  return generateTemplateMetadata(template, 'design');
 }
 
 export default async function DetailPage({ params }: PageProps) {
@@ -44,33 +45,12 @@ export default async function DetailPage({ params }: PageProps) {
     return notFound();
   }
 
-  // JSON-LD Structured Data
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Course",
-    "name": template.name,
-    "description": template.shortDescription,
-    "provider": {
-      "@type": "Organization",
-      "name": "Frontend Dummies",
-      "sameAs": "https://frontenddummies.com/"
-    },
-    "educationalLevel": template.tags.find(t => ['Easy', 'Medium', 'Hard'].includes(t)) || 'Intermediate',
-    "teaches": template.techStack,
-    "keywords": template.tags.join(', '),
-    "datePublished": template.createdAt,
-    "author": {
-      "@type": "Person",
-      "name": template.author
-    },
-    "image": template.imageUrl,
-    "url": `https://frontenddummies.com/design/${template.slug}`,
-    "hasCourseInstance": {
-      "@type": "CourseInstance",
-      "courseMode": "online",
-      "courseWorkload": "PT45M"
-    }
-  };
+  const relatedChallenges = getRelatedChallenges(slug, 3);
+  const structuredData = generateCourseStructuredData(template);
+  const breadcrumbData = generateBreadcrumbStructuredData([
+    { name: 'Explore', url: 'https://frontenddummies.com/explore' },
+    { name: template.name, url: `https://frontenddummies.com/design/${template.slug}` },
+  ]);
 
   return (
     <>
@@ -78,14 +58,22 @@ export default async function DetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
+      />
       <div className="min-h-screen bg-dark-bg pt-24 pb-12 relative overflow-hidden">
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className={`${styles.glowBlob} bg-primary-600/5 w-[800px] h-[800px] top-[0] right-[-200px] blur-[120px]`}></div>
         </div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-
-
+          <Breadcrumbs
+            items={[
+              { label: 'Explore', href: '/explore' },
+              { label: template.name, href: `/design/${template.slug}` },
+            ]}
+          />
           <div className="mb-8">
             <BackButton />
           </div>
@@ -153,6 +141,7 @@ export default async function DetailPage({ params }: PageProps) {
                   height={1000}
                   className="w-full h-full rounded-[12px]  lg:object-cover opacity-90"
                   priority
+                  quality={90}
                 />
               </div>
 
@@ -167,6 +156,15 @@ export default async function DetailPage({ params }: PageProps) {
               <GiscusComments />
             </div>
           </div>
+
+          {/* Related Content */}
+          {relatedChallenges.length > 0 && (
+            <RelatedContent
+              templates={relatedChallenges}
+              title="Related Challenges"
+              viewAllHref="/explore"
+            />
+          )}
         </div>
       </div>
     </>

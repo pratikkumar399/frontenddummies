@@ -5,44 +5,15 @@ import { Sparkles, ArrowRight, Code2, Globe, Cpu, Github } from 'lucide-react';
 import { LinkButton } from '@repo/ui';
 import { useApp } from '@/context/AppContext';
 import { ButtonSize, ButtonVariant } from '@/types/types';
+import { generateWebsiteStructuredData, generateOrganizationStructuredData } from '@/lib/seo';
 
 export default function Home() {
   const { templates } = useApp();
 
   const featuredTemplates = templates.slice(0, 4);
 
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Frontend Dummies",
-    "description": "A comprehensive platform for mastering frontend coding skills, system design, and building real-world projects.",
-    "url": "https://frontenddummies.com/",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://frontenddummies.com/explore?search={search_term_string}",
-      "query-input": "required name=search_term_string"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Frontend Dummies",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://frontenddummies.com/og-image.png"
-      }
-    }
-  };
-
-  const organizationData = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Frontend Dummies",
-    "url": "https://frontenddummies.com/",
-    "logo": "https://frontenddummies.com/og-image.png",
-    "sameAs": [
-      "https://github.com/pratikkumar399/frontendfordummies"
-    ],
-    "description": "A comprehensive platform for mastering frontend coding skills, system design, and building real-world projects."
-  };
+  const structuredData = generateWebsiteStructuredData();
+  const organizationData = generateOrganizationStructuredData();
 
   return (
     <>

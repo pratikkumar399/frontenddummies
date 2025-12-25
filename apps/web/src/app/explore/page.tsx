@@ -8,6 +8,7 @@ import { TemplateListItem } from '@/components/TemplateListItem';
 import { Category, ButtonVariant, ButtonSize } from '@/types/types';
 import { Button } from '@repo/ui';
 import { Search, Layers, ChevronRight, Zap, Menu, X, Grid3x3, List } from 'lucide-react';
+import { generateCollectionStructuredData } from '@/lib/seo';
 
 type ViewMode = 'card' | 'list';
 
@@ -91,44 +92,16 @@ export default function ExplorePage() {
   }, [searchParams, router]);
 
   // JSON-LD Structured Data
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    "name": "Explore Frontend Challenges",
-    "description": "Browse our complete collection of frontend coding challenges, system design problems, and interactive practice exercises.",
-    "url": "https://frontenddummies.com/explore",
-    "mainEntity": {
-      "@type": "ItemList",
-      "numberOfItems": templates.length,
-      "itemListElement": templates.slice(0, 10).map((template, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "item": {
-          "@type": "Course",
-          "name": template.name,
-          "description": template.shortDescription,
-          "url": `https://frontenddummies.com/design/${template.slug}`
-        }
-      }))
-    },
-    "breadcrumb": {
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://frontenddummies.com/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Explore",
-          "item": "https://frontenddummies.com/explore"
-        }
-      ]
-    }
-  };
+  const structuredData = generateCollectionStructuredData(
+    'Explore Frontend Challenges',
+    'Browse our complete collection of frontend coding challenges, system design problems, and interactive practice exercises.',
+    templates.map((template) => ({
+      name: template.name,
+      description: template.shortDescription,
+      url: `https://frontenddummies.com/design/${template.slug}`,
+    })),
+    '/explore'
+  );
 
   return (
     <>

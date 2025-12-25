@@ -5,6 +5,7 @@ import { useApp } from '@/context/AppContext';
 import { TemplateCard } from '@/components/TemplateCard';
 import { Category } from '@/types/types';
 import { Search, Zap } from 'lucide-react';
+import { generateBreadcrumbStructuredData } from '@/lib/seo';
 
 export default function BlogPage() {
   const { templates } = useApp();
@@ -44,12 +45,20 @@ export default function BlogPage() {
       "image": blog.imageUrl
     }))
   };
+  const breadcrumbData = generateBreadcrumbStructuredData([
+    { name: 'Home', url: 'https://frontenddummies.com/' },
+    { name: 'Blog', url: 'https://frontenddummies.com/blog' },
+  ]);
 
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
       />
       <div className="min-h-screen bg-dark-bg pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

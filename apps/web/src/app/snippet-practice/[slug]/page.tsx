@@ -16,6 +16,7 @@ import { validateCode, sanitizeError } from '@/lib/code-execution';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import { showToast } from '@/lib/toast';
 import { throttle } from '@/lib/utils';
+import { generateQuizStructuredData, generateBreadcrumbStructuredData } from '@/lib/seo';
 
 export default function SnippetPracticePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -103,24 +104,12 @@ export default function SnippetPracticePage() {
     );
   }
 
-  // JSON-LD Structured Data
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Quiz",
-    "name": template.name,
-    "description": template.shortDescription,
-    "educationalLevel": template.tags.find(t => ['Easy', 'Medium', 'Hard'].includes(t)) || 'Intermediate',
-    "teaches": template.techStack,
-    "author": {
-      "@type": "Person",
-      "name": template.author
-    },
-    "datePublished": template.createdAt,
-    "numberOfQuestions": template.snippets?.length || 0,
-    "url": `https://frontenddummies.com/snippet-practice/${template.slug}`,
-    "inLanguage": "en-US",
-    "interactivityType": "active"
-  };
+  // JSON-LD Structured Data - using SEO utility
+  const structuredData = generateQuizStructuredData(template);
+  const breadcrumbData = generateBreadcrumbStructuredData([
+    { name: 'Design', url: `https://frontenddummies.com/design/${slug}` },
+    { name: 'Snippet Practice', url: `https://frontenddummies.com/snippet-practice/${slug}` },
+  ]);
 
   const handleRunSnippet = useCallback((id: string, code: string) => {
     // Check rate limit
@@ -202,6 +191,10 @@ export default function SnippetPracticePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
       />
       <div className="min-h-screen bg-dark-bg pt-16">
 

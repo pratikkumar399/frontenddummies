@@ -1,53 +1,33 @@
 import type { Metadata } from "next";
-import { INITIAL_TEMPLATES } from '@/lib/constants';
+import { getChallengeBySlug, getAllSlugs } from '@/lib/challenges';
+import { generateTemplateMetadata } from '@/lib/seo';
+
+export async function generateStaticParams() {
+  const slugs = getAllSlugs();
+  return slugs
+    .map((slug) => {
+      const template = getChallengeBySlug(slug);
+      // Only generate params for templates with starter code
+      if (template?.starterCode) {
+        return { slug };
+      }
+      return null;
+    })
+    .filter((item): item is { slug: string } => item !== null);
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const template = INITIAL_TEMPLATES.find(t => t.slug === slug);
+  const template = getChallengeBySlug(slug);
 
-  if (!template) {
+  if (!template || !template.starterCode) {
     return {
       title: 'Practice Not Found',
       description: 'The requested practice challenge could not be found.',
     };
   }
 
-  const title = `${template.name} - Code Practice`;
-  const description = `Practice ${template.name} with our interactive code editor. ${template.shortDescription}`;
-  const url = `https://frontenddummies.com/practice/${slug}`;
-
-  return {
-    title,
-    description,
-    keywords: [...template.tags, ...template.techStack, 'code editor', 'practice', 'coding challenge', 'interactive'],
-    authors: [{ name: template.author }],
-    openGraph: {
-      type: 'article',
-      url,
-      title,
-      description,
-      images: [
-        {
-          url: template.imageUrl,
-          width: 1200,
-          height: 630,
-          alt: `${template.name} Practice`,
-        },
-      ],
-      publishedTime: template.createdAt,
-      authors: [template.author],
-      tags: [...template.tags, 'practice'],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [template.imageUrl],
-    },
-    alternates: {
-      canonical: url,
-    },
-  };
+  return generateTemplateMetadata(template, 'practice');
 }
 
 export default function PracticeLayout({

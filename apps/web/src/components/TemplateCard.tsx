@@ -56,6 +56,8 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template }) => {
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          loading="lazy"
+          quality={85}
         />
         
         {/* Floating Category Badge */}

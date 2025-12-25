@@ -47,6 +47,8 @@ export const TemplateListItem: React.FC<TemplateListItemProps> = ({ template }) 
           className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
           sizes="(max-width: 640px) 100vw, 128px"
           style={{ borderRadius: '0.75rem' }}
+          loading="lazy"
+          quality={85}
         />
       </div>
 
