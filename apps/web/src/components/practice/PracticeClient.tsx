@@ -157,23 +157,7 @@ function PracticeClientInner({ slug, editorial }: PracticeClientProps) {
     };
   }, [isDraggingH, isDraggingV, handleMouseMove, handleMouseUp]);
 
-  if (!templates.length) {
-    return (
-      <PageLoader
-        title="Loading question..."
-        subtitle="Fetching the template..."
-      />
-    );
-  }
 
-  if (!template) {
-    return (
-      <div className="min-h-screen bg-[#1a1a1a] flex flex-col items-center justify-center p-4 text-white">
-        <h2 className="text-xl mb-4">Template not found</h2>
-        <Button onClick={() => router.push('/')} variant={ButtonVariant.PRIMARY} size={ButtonSize.SM}>Go Home</Button>
-      </div>
-    );
-  }
 
   const handleRunCode = useCallback(async () => {
     if (cleanupTimerRef.current) {
@@ -378,6 +362,23 @@ function PracticeClientInner({ slug, editorial }: PracticeClientProps) {
     }
   };
 
+  if (!templates.length) {
+    return (
+      <PageLoader
+        title="Loading question..."
+        subtitle="Fetching the template..."
+      />
+    );
+  }
+
+  if (!template) {
+    return (
+      <div className="min-h-screen bg-[#1a1a1a] flex flex-col items-center justify-center p-4 text-white">
+        <h2 className="text-xl mb-4">Template not found</h2>
+        <Button onClick={() => router.push('/')} variant={ButtonVariant.PRIMARY} size={ButtonSize.SM}>Go Home</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#1a1a1a] text-[#eff1f6] font-sans">
@@ -762,5 +763,3 @@ const EditorialCodeBlock = ({ language, value }: { language: string, value: stri
     </div>
   );
 };
-
-

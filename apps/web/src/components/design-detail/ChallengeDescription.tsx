@@ -3,11 +3,11 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { Template, ButtonVariant, ButtonSize } from '@/types/types';
 import { Copy, Check } from 'lucide-react';
 import { Button } from '@repo/ui';
 import styles from './ChallengeDescription.module.css';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 interface ChallengeDescriptionProps {
   template: Template;
@@ -25,12 +25,12 @@ export const ChallengeDescription: React.FC<ChallengeDescriptionProps> = ({ temp
               const match = /language-(\w+)/.exec(className || '');
               const isInline = !match;
               const codeString = String(children).replace(/\n$/, '');
-              
+
               return !isInline ? (
-                <CodeBlock 
-                   language={match[1]} 
-                   value={codeString} 
-                   style={oneDark}
+                <CodeBlock
+                   language={match[1]}
+                   value={codeString}
+                   style={vscDarkPlus}
                 />
               ) : (
                 <code className="bg-dark-border px-1.5 py-0.5 rounded text-primary-300 text-sm" {...props}>

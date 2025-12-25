@@ -26,7 +26,7 @@
 .markdownContent p {
   margin-bottom: 1em;
   line-height: 1.7;
-  color: #a1a1aa;
+  color: #fff;
 }
 
 .markdownContent ul,
@@ -34,7 +34,7 @@
   margin-bottom: 1em;
   padding-left: 1.5em;
   list-style-type: disc;
-  color: #a1a1aa;
+  color: #fff;
 }
 
 .markdownContent li {
@@ -84,4 +84,3 @@
   color: #fff;
   font-weight: 600;
 }
-
