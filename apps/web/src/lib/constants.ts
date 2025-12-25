@@ -311,7 +311,7 @@ In this challenge, implement a polyfill that mirrors call's behavior:
     id: '15',
     name: 'Image Carousel',
     slug: 'image-carousel',
-    shortDescription: '',
+    shortDescription: 'A carousel component that can be used to display a list of images.',
     fullDescription: '',
     imageUrl: 'https://placehold.co/800x600/14b8a6/ffffff/png?text=image+carousel',
     demoUrl: '/design/image-carousel/demo',
@@ -323,5 +323,22 @@ In this challenge, implement a polyfill that mirrors call's behavior:
     author: 'modernDev',
     createdAt: '2025-12-22',
     goal: 'Implement a image carousel component that can be used to display a list of images.'
+  },
+  {
+    id: '16',
+    name: 'Dynamic Tic Tac Toe',
+    slug: 'dynamic-tic-tac-toe',
+    shortDescription: 'A dynamic tic tac toe game that can be used to play a game of tic tac toe.',
+    fullDescription: '',
+    imageUrl: 'https://placehold.co/800x600/14b8a6/ffffff/png?text=dynamic+tic+tac+toe',
+    demoUrl: '/design/dynamic-tic-tac-toe/demo',
+    githubUrl: '#',
+    tags: ['Medium', 'Tic Tac Toe', 'React'],
+    category: Category.REACT,
+    subcategory: ReactSubcategory.MACHINE_CODING_QUESTIONS,
+    techStack: ['React'],
+    author: 'modernDev',
+    createdAt: '2025-12-22',
+    goal: 'Implement a dynamic tic tac toe game that can be used to play a game of tic tac toe.'
   }
 ];

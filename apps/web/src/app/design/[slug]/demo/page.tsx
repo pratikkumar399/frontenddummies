@@ -10,11 +10,13 @@ import { getDemoFiles } from '@/lib/code-loader';
 import { CodeViewer } from '@/components/design-detail/CodeViewer';
 import { BackButton } from '@/components/design-detail/BackButton';
 import ImageCarouselHome from '@/components/demos/ImageCarousel';
+import DynamicTicTacToe from '@/components/demos/DynamicTicTacToe';
 
 const DEMO_REGISTRY: Record<string, React.FC> = {
   'nested-comments-system': CommentsList,
   'modal-component': ModalDemo,
-  'image-carousel': ImageCarouselHome
+  'image-carousel': ImageCarouselHome,
+  'dynamic-tic-tac-toe': DynamicTicTacToe
 };
 
 type PageProps = {

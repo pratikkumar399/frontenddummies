@@ -1,0 +1,310 @@
+Build an image carousel that displays one image at a time with smooth navigation, infinite looping, and optimal performance. The key challenges are implementing circular navigation logic and using CSS transforms to prevent layout thrashing.
+
+## Architecture Overview
+
+The carousel uses a **viewport + track** pattern:
+
+```
+┌─────────────────────────────────────┐
+│  [← Prev]  ┌──────────┐  [Next →]   │
+│            │ Viewport │             │
+│            │ (400px)  │             │
+│            └──────────┘             |
+│                 │                   |
+│            ┌────▼─────────────────┐ │
+│            │ Track (flex container) |
+│            │ [Img1][Img2][Img3]...  |
+│            └──────────────────────┘ |
+└─────────────────────────────────────┘
+```
+
+![Image Carousel Architecture](/assets/carousel-image.png)
+
+
+- **Viewport**: Fixed-width container with `overflow: hidden` that shows only one image
+- **Track**: Wide flex container that holds all images side-by-side
+- **Transform**: Moves the track left/right to reveal different images
+
+## Component Structure
+
+The implementation follows a **controlled component** pattern:
+
+```tsx
+// Parent component manages state
+const [currentIndex, setCurrentIndex] = useState(0);
+
+// Child component receives props
+<ImageCarouselComponent 
+    images={imageUrls} 
+    onPrev={handlePrevClick} 
+    onNext={handleNextClick} 
+    currentIndex={currentIndex} 
+/>
+```
+
+This separation allows:
+- **Reusability**: The carousel component is pure and doesn't manage its own state
+- **Flexibility**: Parent controls the navigation logic
+- **No unnecessary re-renders**: Only `currentIndex` changes trigger updates
+
+## Circular Navigation Logic
+
+The infinite loop is achieved using the **modulo operator** (`%`). This creates a circular index that wraps around at the boundaries.
+
+### Next Button Logic
+
+```tsx
+function handleNextClick() {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % total);
+}
+```
+
+**How it works:**
+- `prevIndex + 1`: Move to next index
+- `% total`: Wrap around when reaching the end
+
+**Examples with 5 images (indices 0-4):**
+- Index 0 → `(0 + 1) % 5 = 1` 
+- Index 1 → `(1 + 1) % 5 = 2` 
+- Index 2 → `(2 + 1) % 5 = 3` 
+- Index 3 → `(3 + 1) % 5 = 4` 
+- Index 4 → `(4 + 1) % 5 = 0`  (wraps to first)
+
+### Previous Button Logic
+
+```tsx
+function handlePrevClick() {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + total) % total);
+}
+```
+
+**Why `(prevIndex - 1 + total)`?**
+- `prevIndex - 1`: Move to previous index
+- `+ total`: Add total to handle negative values
+- `% total`: Wrap around
+
+**Examples with 5 images:**
+- Index 0 → `(0 - 1 + 5) % 5 = 4`  (wraps to last)
+- Index 1 → `(1 - 1 + 5) % 5 = 0` 
+- Index 2 → `(2 - 1 + 5) % 5 = 1` 
+- Index 3 → `(3 - 1 + 5) % 5 = 2` 
+- Index 4 → `(4 - 1 + 5) % 5 = 3` 
+
+**Why not just `(prevIndex - 1) % total`?**
+In JavaScript, `-1 % 5` equals `-1`, not `4`. Adding `total` first ensures we get a positive number before applying modulo:
+- `(-1 + 5) % 5 = 4 % 5 = 4` ✓
+
+## Transform-Based Sliding
+
+The carousel uses CSS `transform: translateX()` to slide images. This is crucial for performance.
+
+### The Math Behind the Transform
+
+```tsx
+transform: `translateX(-${(currentIndex * 100) / images.length}%)`
+```
+
+**Breaking it down:**
+1. Each image takes `100 / images.length`% of the track width
+2. To show image at index `i`, we need to shift the track left by `i` image widths
+3. `currentIndex * (100 / images.length)` = percentage to shift
+
+**Example with 5 images:**
+- Each image width: `100 / 5 = 20%` of track
+- Index 0: `translateX(-0%)` → shows first image
+- Index 1: `translateX(-20%)` → shows second image
+- Index 2: `translateX(-40%)` → shows third image
+- Index 3: `translateX(-60%)` → shows fourth image
+- Index 4: `translateX(-80%)` → shows fifth image
+
+**General formula:**
+```
+translateX(-(currentIndex × 100) / images.length %)
+```
+
+### Track and Image Sizing
+
+**Track width:**
+```tsx
+width: `${images.length * 100}%`
+```
+- If we have 5 images, track is `500%` of viewport width
+- Each image takes `100%` of viewport (which is `20%` of track)
+
+**Individual image width:**
+```tsx
+width: `${100 / images.length}%`
+```
+- For 5 images: `100 / 5 = 20%` of track width
+- This ensures all images fit side-by-side in the track
+
+**Visual representation (5 images):**
+```
+Viewport (400px):
+┌────────────────────┐
+│                    │
+└────────────────────┘
+         │
+         ▼
+Track (2000px = 500%):
+┌────┬────┬────┬────┬────┐
+│Img1│Img2│Img3│Img4│Img5│  Each: 400px (20% of 2000px)
+└────┴────┴────┴────┴────┘
+     │
+     └─ translateX(-20%) shows Img2
+```
+
+## Performance Optimizations
+
+### 1. Using Transform Instead of Position
+
+**Why transform?**
+- `transform` and `opacity` are GPU-accelerated properties
+- They don't trigger **reflow** (layout recalculation)
+- They only trigger **repaint** (visual update)
+- Much faster than changing `left`, `top`, or `margin`
+
+**What happens with position changes:**
+```css
+/* BAD: Triggers reflow */
+.track {
+    left: -400px;  /* Browser recalculates layout */
+}
+```
+
+**What happens with transform:**
+```css
+/* GOOD: Only triggers repaint */
+.track {
+    transform: translateX(-400px);  /* Browser only updates visual */
+}
+```
+
+### 2. Keeping All Images in DOM
+
+All images are rendered in the DOM simultaneously:
+
+```tsx
+{images.map((image, index) => (
+    <img key={index} src={image} />
+))}
+```
+
+**Benefits:**
+- **No layout thrashing**: Images don't get added/removed, preventing reflow
+- **Smooth transitions**: CSS transitions work seamlessly
+- **Preloading**: Images can start loading before they're visible
+
+**Trade-off:**
+- Higher initial memory usage
+- All images load at once (can be optimized with lazy loading)
+
+### 3. CSS Transitions
+
+```css
+.track {
+    transition: transform 0.5s ease-in-out;
+}
+```
+
+This provides smooth animation when `currentIndex` changes. The browser automatically animates the `transform` property between values.
+
+## Component Implementation Details
+
+### Viewport Container
+
+```tsx
+<div className="viewport">
+```
+
+**CSS:**
+```css
+.viewport {
+    width: 400px;        /* Fixed width */
+    overflow: hidden;    /* Hides images outside viewport */
+}
+```
+
+The viewport acts as a "window" that shows only one image at a time.
+
+### Track Container
+
+```tsx
+<div className="track" style={{ transform: `translateX(...)` }}>
+```
+
+**CSS:**
+```css
+.track {
+    display: flex;        /* Images side-by-side */
+    transition: transform 0.5s ease-in-out;  /* Smooth animation */
+}
+```
+
+The track holds all images and slides horizontally based on `currentIndex`.
+
+### Image Rendering
+
+```tsx
+{images.map((image, index) => (
+    <img 
+        key={index} 
+        src={image}
+        style={{
+            width: `${100 / images.length}%`,
+            height: '300px',
+            objectFit: 'contain'
+        }}
+    />
+))}
+```
+
+Each image:
+- Takes `100 / images.length`% of track width
+- Has fixed height for consistency
+- Uses `objectFit: contain` to maintain aspect ratio
+
+## Advanced Optimizations
+
+### Lazy Loading Images
+
+To prevent loading all images at once, use native lazy loading:
+
+```tsx
+<img 
+    src={image}
+    loading={index === currentIndex || 
+             index === currentIndex + 1 || 
+             index === currentIndex - 1 ? "eager" : "lazy"}
+/>
+```
+
+This loads:
+- Current image immediately
+- Next and previous images (for smooth transitions)
+- Other images lazily
+
+### Preventing Layout Shift
+
+Set explicit dimensions to prevent Cumulative Layout Shift (CLS):
+
+```tsx
+<img 
+    src={image}
+    width={400}
+    height={300}
+    style={{ aspectRatio: '4/3' }}
+/>
+```
+
+## Key Takeaways
+
+1. **Circular Navigation**: Use `(index + 1) % total` for next and `(index - 1 + total) % total` for previous
+2. **Transform Formula**: `translateX(-(currentIndex × 100) / images.length %)`
+3. **Track Width**: `images.length × 100%` to fit all images
+4. **Image Width**: `100 / images.length%` so images fit side-by-side
+5. **Performance**: Use `transform` instead of position changes to avoid reflow
+6. **Architecture**: Controlled component pattern for reusability and no unnecessary re-renders
+
+The carousel is efficient, smooth, and works with any number of images because it's based on mathematical relationships rather than hardcoded values.
+

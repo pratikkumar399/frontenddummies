@@ -1,0 +1,309 @@
+Build a dynamic Tic Tac Toe game that works with any grid size (m × n). The key challenges are mapping 2D coordinates to a 1D array and implementing winning logic that works for any grid dimensions.
+
+## The Core Challenge: 2D to 1D Index Mapping
+
+The most critical part of building a dynamic Tic Tac Toe is understanding how to convert 2D grid coordinates (row `m`, column `n`) into a 1D array index. This is the foundation that makes everything else work.
+
+### Why a 1D Array?
+
+We store the board state as a 1D array because:
+- It's simpler to manage state in React
+- Easier to check for winners programmatically
+- More efficient for updates and comparisons
+
+But we need to render it as a 2D grid, so we need a conversion formula.
+
+### The Index Formula
+
+The magic formula is:
+
+```
+index = m × cols + n
+```
+
+Where:
+- `m` = row index (0-based)
+- `n` = column index (0-based)
+- `cols` = total number of columns
+
+### Visual Example: 3×3 Grid
+
+Let's see how this works for a 3×3 grid:
+
+```
+Grid Layout:          Array Index:
+┌───┬───┬───┐
+│ 0 │ 1 │ 2 │  →  [0, 1, 2, 3, 4, 5, 6, 7, 8]
+├───┼───┼───┤
+│ 3 │ 4 │ 5 │
+├───┼───┼───┤
+│ 6 │ 7 │ 8 │
+└───┴───┴───┘
+```
+
+**Examples:**
+- Cell at row 0, col 0: `index = 0 × 3 + 0 = 0` 
+- Cell at row 0, col 2: `index = 0 × 3 + 2 = 2` 
+- Cell at row 1, col 0: `index = 1 × 3 + 0 = 3` 
+- Cell at row 1, col 1: `index = 1 × 3 + 1 = 4` 
+- Cell at row 2, col 2: `index = 2 × 3 + 2 = 8`
+
+### Why This Formula Works
+
+Think of it like reading a book:
+- Each row has `cols` cells
+- To get to row `m`, you need to skip `m` complete rows
+- That's `m × cols` cells
+- Then add `n` to move to the column within that row
+
+**For a 4×5 grid:**
+- Row 0: indices 0-4 (0×5 + 0 through 0×5 + 4)
+- Row 1: indices 5-9 (1×5 + 0 through 1×5 + 4)
+- Row 2: indices 10-14 (2×5 + 0 through 2×5 + 4)
+- Row 3: indices 15-19 (3×5 + 0 through 3×5 + 4)
+
+### Implementation
+
+```tsx
+const handlePlay = (m: number, n: number) => {
+    const index = m * cols + n;
+    // Now use board[index] to access/update the cell
+};
+```
+
+When rendering, we do the reverse:
+
+```tsx
+{new Array(rows).fill(null).map((_, rowIndex) => (
+    <div key={rowIndex} className="board-row">
+        {new Array(cols).fill(null).map((_, colIndex) => {
+            const index = rowIndex * cols + colIndex;
+            const cellValue = board[index];
+            // Render cell with cellValue
+        })}
+    </div>
+))}
+```
+
+## Winning Logic: The Three Checks
+
+The winning logic must check three patterns: rows, columns, and diagonals. Each check follows the same principle: all cells in a line must be equal and non-null.
+
+### 1. Row Check
+
+For each row, check if all columns have the same value.
+
+**Pattern:** For row `i`, check cells from `i × cols` to `i × cols + (cols - 1)`
+
+```tsx
+// Check rows
+for (let i = 0; i < numRows; i++) {
+    const rowStart = i * numCols;  // First cell in row i
+    const firstCell = currentBoard[rowStart];
+    
+    if (firstCell !== null) {
+        let allSame = true;
+        // Check all other cells in this row
+        for (let j = 1; j < numCols; j++) {
+            if (currentBoard[rowStart + j] !== firstCell) {
+                allSame = false;
+                break;
+            }
+        }
+        if (allSame) return firstCell;  // Winner found!
+    }
+}
+```
+
+**Example for 3×3:**
+- Row 0: Check indices [0, 1, 2]
+- Row 1: Check indices [3, 4, 5]
+- Row 2: Check indices [6, 7, 8]
+
+**Example for 4×5:**
+- Row 0: Check indices [0, 1, 2, 3, 4]
+- Row 1: Check indices [5, 6, 7, 8, 9]
+- Row 2: Check indices [10, 11, 12, 13, 14]
+- Row 3: Check indices [15, 16, 17, 18, 19]
+
+### 2. Column Check
+
+For each column, check if all rows have the same value.
+
+**Pattern:** For column `j`, check cells at `j`, `cols + j`, `2×cols + j`, ..., `(rows-1)×cols + j`
+
+```tsx
+// Check columns
+for (let j = 0; j < numCols; j++) {
+    const firstCell = currentBoard[j];  // Top cell in column j
+    
+    if (firstCell !== null) {
+        let allSame = true;
+        // Check all rows in this column
+        for (let i = 1; i < numRows; i++) {
+            if (currentBoard[i * numCols + j] !== firstCell) {
+                allSame = false;
+                break;
+            }
+        }
+        if (allSame) return firstCell;  // Winner found!
+    }
+}
+```
+
+**The key insight:** To move down a column, we add `cols` to the index each time.
+
+**Example for 3×3:**
+- Column 0: Check indices [0, 3, 6] (0, 0+3, 0+6)
+- Column 1: Check indices [1, 4, 7] (1, 1+3, 1+6)
+- Column 2: Check indices [2, 5, 8] (2, 2+3, 2+6)
+
+**Example for 4×5:**
+- Column 0: Check indices [0, 5, 10, 15] (0, 0+5, 0+10, 0+15)
+- Column 1: Check indices [1, 6, 11, 16] (1, 1+5, 1+10, 1+15)
+- Column 2: Check indices [2, 7, 12, 17] (2, 2+5, 2+10, 2+15)
+- Column 3: Check indices [3, 8, 13, 18] (3, 3+5, 3+10, 3+15)
+- Column 4: Check indices [4, 9, 14, 19] (4, 4+5, 4+10, 4+15)
+
+### 3. Diagonal Checks
+
+Diagonals only make sense for square grids (where `rows === cols`). There are two diagonals:
+
+#### Left-to-Right Diagonal (Top-Left to Bottom-Right)
+
+**Pattern:** Check cells at `0`, `cols + 1`, `2×cols + 2`, ..., `(rows-1)×cols + (rows-1)`
+
+The formula is: `i × cols + i` for `i` from 0 to `rows-1`
+
+```tsx
+// Left-to-right diagonal
+const firstCell = currentBoard[0];
+if (firstCell !== null) {
+    let allSame = true;
+    for (let i = 1; i < numRows; i++) {
+        if (currentBoard[i * numCols + i] !== firstCell) {
+            allSame = false;
+            break;
+        }
+    }
+    if (allSame) return firstCell;
+}
+```
+
+**Example for 3×3:**
+- Check indices [0, 4, 8] (0×3+0, 1×3+1, 2×3+2)
+
+**Example for 4×4:**
+- Check indices [0, 5, 10, 15] (0×4+0, 1×4+1, 2×4+2, 3×4+3)
+
+#### Right-to-Left Diagonal (Top-Right to Bottom-Left)
+
+**Pattern:** Check cells at `cols-1`, `2×cols - 2`, `3×cols - 3`, ..., `(rows-1)×cols - (rows-1)`
+
+The formula is: `i × cols + (cols - 1 - i)` for `i` from 0 to `rows-1`
+
+```tsx
+// Right-to-left diagonal
+const topRightCell = currentBoard[numCols - 1];
+if (topRightCell !== null) {
+    let allSame = true;
+    for (let i = 1; i < numRows; i++) {
+        if (currentBoard[i * numCols + (numCols - 1 - i)] !== topRightCell) {
+            allSame = false;
+            break;
+        }
+    }
+    if (allSame) return topRightCell;
+}
+```
+
+**Example for 3×3:**
+- Check indices [2, 4, 6] (0×3+2, 1×3+1, 2×3+0)
+  - Row 0, Col 2: `0 × 3 + (3-1-0) = 0 + 2 = 2`
+  - Row 1, Col 1: `1 × 3 + (3-1-1) = 3 + 1 = 4`
+  - Row 2, Col 0: `2 × 3 + (3-1-2) = 6 + 0 = 6`
+
+**Example for 4×4:**
+- Check indices [3, 6, 9, 12] (0×4+3, 1×4+2, 2×4+1, 3×4+0)
+
+### Why We Check `firstCell !== null`
+
+Before checking if all cells match, we verify the first cell isn't empty. This optimization:
+- Skips checking empty rows/columns/diagonals
+- Ensures we only declare a winner when there's an actual value
+
+## Draw Condition
+
+A draw occurs when:
+1. There's no winner (`winner === null`)
+2. All cells are filled (`board.every(cell => cell !== null)`)
+
+```tsx
+const isDraw = board.every(cell => cell !== null) && winner === null;
+```
+
+This is simple: if every cell has a value and no one won, it's a draw.
+
+## Component Architecture
+
+The implementation splits responsibilities:
+
+1. **DynamicTicTacToe** (Main Component):
+   - Manages game state (`currentPlayer`, `board`, `winner`)
+   - Handles move logic (`handlePlay`)
+   - Implements winning logic (`checkWinner`)
+   - Provides reset functionality
+
+2. **TicTacToe** (Board Component):
+   - Renders the grid dynamically based on `rows` and `cols`
+   - Handles cell clicks
+   - Disables cells when game is over or cell is filled
+   - Calls `onPlay(m, n)` with row and column indices
+
+### State Management
+
+```tsx
+const [currentPlayer, setCurrentPlayer] = useState<"X" | "O">("X");
+const [board, setBoard] = useState<(string | null)[]>([]);
+const [winner, setWinner] = useState<string | null>(null);
+```
+
+- `currentPlayer`: Toggles between "X" and "O"
+- `board`: 1D array of size `rows × cols`, initially all `null`
+- `winner`: Set when a winning condition is detected
+
+### Move Handling Flow
+
+1. **Validate move**: Check if cell is empty and game isn't over
+2. **Update board**: Create new array with the move
+3. **Check winner**: Run all three checks (rows, columns, diagonals)
+4. **Update state**: Either set winner or switch player
+
+### Dynamic Grid Rendering
+
+The board component uses nested loops to render the grid:
+
+```tsx
+{Array.from({ length: rows }).map((_, rowIndex) => (
+    <div key={rowIndex} className="board-row">
+        {Array.from({ length: cols }).map((_, colIndex) => {
+            const index = rowIndex * cols + colIndex;
+            const cellValue = board[index];
+            // Render button with cellValue
+        })}
+    </div>
+))}
+```
+
+This works for any `rows` and `cols` values, making the component truly dynamic.
+
+## Key Takeaways
+
+1. **Index Formula**: `index = m × cols + n` converts 2D coordinates to 1D array index
+2. **Row Check**: All cells from `i × cols` to `i × cols + (cols - 1)` must match
+3. **Column Check**: All cells at `j`, `cols + j`, `2×cols + j`, ... must match
+4. **Diagonal Check**: Only for square grids, using `i × cols + i` (left-right) and `i × cols + (cols - 1 - i)` (right-left)
+5. **Draw Detection**: All cells filled + no winner = draw
+
+The beauty of this approach is that it scales to any grid size. Whether it's 3×3, 5×5, or even 4×7, the same logic works because it's based on mathematical relationships, not hardcoded positions.
+
